@@ -29,7 +29,13 @@ jobs:
       - name: Exercise the CLI
         run: |
           genai-tracecheck check examples/valid.otlp.json --output reports/valid.json
+          genai-tracecheck check examples/structured-content.otlp.json \
+            --output reports/structured-content.json
           if genai-tracecheck check examples/risky.otlp.json; then
             echo "Expected risky fixture to fail"
+            exit 1
+          fi
+          if genai-tracecheck check examples/malformed-content.otlp.json; then
+            echo "Expected malformed content fixture to fail"
             exit 1
           fi

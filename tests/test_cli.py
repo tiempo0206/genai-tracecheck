@@ -35,3 +35,11 @@ def test_cli_writes_report_atomically_and_requires_force(tmp_path: Path, capsys)
     assert json.loads(output_path.read_text(encoding="utf-8"))["passed"] is True
     assert main(args) == 2
     assert "use --force" in capsys.readouterr().err
+
+
+def test_cli_accepts_schema_valid_structured_content(capsys) -> None:
+    exit_code = main(["check", str(ROOT / "examples" / "structured-content.otlp.json")])
+
+    output = json.loads(capsys.readouterr().out)
+    assert exit_code == 0
+    assert output["summary"]["errors"] == 0

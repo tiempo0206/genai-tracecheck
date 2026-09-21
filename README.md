@@ -60,6 +60,8 @@ genai-tracecheck check trace.json --content-policy allow --no-secret-detection
 | `GTC102` | GenAI semantics | warning | `gen_ai.provider.name` is present when available |
 | `GTC103` | GenAI semantics | warning | A request or response model is recorded when available |
 | `GTC104` | GenAI semantics | error | Token usage values are non-negative integers |
+| `GTC105` | GenAI content schema | error | Messages, instructions, and known part types have valid structure |
+| `GTC106` | GenAI content schema | warning | Output messages do not use deprecated `finish_reason` |
 | `GTC201` | Local privacy policy | warning/error | Captured GenAI content is surfaced for review or forbidden |
 | `GTC202` | Local privacy heuristic | error | Secret-shaped values do not appear in captured content |
 
@@ -81,7 +83,7 @@ Output is a versioned JSON document with a summary and stable, sortable findings
   "summary": {
     "spans": 1,
     "genai_spans": 1,
-    "errors": 4,
+    "errors": 5,
     "warnings": 3
   },
   "findings": []
@@ -96,9 +98,14 @@ OTLP JSON -> strict loader -> normalized spans -> rule families -> versioned rep
                                OTel semantics    local privacy policy
 ```
 
-The parser, data contracts, rules, and command-line boundary are separate modules. This keeps future
-framework adapters outside the rule engine and makes every finding independently testable. See
+The parser, data contracts, content-schema validator, rules, and command-line boundary are separate
+modules. This keeps future framework adapters outside the rule engine and makes every finding
+independently testable. See
 [`docs/architecture.md`](docs/architecture.md) for design details.
+
+Schema failures report paths such as `$[1].parts[0].name`, never the captured value. Known official
+part types—including text, reasoning, tool calls, tool responses, blobs, files, URIs, and server-side
+tools—receive type-specific checks. Unknown part types remain valid extension points.
 
 ## Standards baseline
 

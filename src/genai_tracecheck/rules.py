@@ -6,6 +6,7 @@ import json
 import re
 from collections.abc import Iterable
 
+from genai_tracecheck.content_validation import SCHEMA_ATTRIBUTES, validate_content_attribute
 from genai_tracecheck.models import ContentPolicy, Finding, Policy, Severity, SpanRecord
 
 TRACE_ID = re.compile(r"[0-9a-f]{32}")
@@ -116,6 +117,31 @@ def semantic_findings(span: SpanRecord) -> Iterable[Finding]:
                     "token usage must be a non-negative integer",
                     key,
                 )
+
+    for key in SCHEMA_ATTRIBUTES:
+        if key not in span.attributes:
+            continue
+        validation = validate_content_attribute(key, span.attributes[key])
+        for issue in validation.issues:
+            yield _finding(
+                span,
+                "GTC105",
+                Severity.ERROR,
+                "captured GenAI content does not match its message schema",
+                key,
+                json_path=issue.path,
+                constraint=issue.constraint,
+            )
+        for path in validation.deprecated_paths:
+            yield _finding(
+                span,
+                "GTC106",
+                Severity.WARNING,
+                "finish_reason in output messages is deprecated; use "
+                "gen_ai.response.finish_reasons",
+                key,
+                json_path=path,
+            )
 
 
 def privacy_findings(span: SpanRecord, policy: Policy) -> Iterable[Finding]:

@@ -29,8 +29,17 @@ def test_risky_trace_reports_structure_semantics_and_privacy() -> None:
 
     rule_ids = {finding.rule_id for finding in report.findings}
     assert report.passed is False
-    assert {"GTC002", "GTC101", "GTC102", "GTC103", "GTC104", "GTC201", "GTC202"} <= rule_ids
-    assert report.summary.errors == 4
+    assert {
+        "GTC002",
+        "GTC101",
+        "GTC102",
+        "GTC103",
+        "GTC104",
+        "GTC105",
+        "GTC201",
+        "GTC202",
+    } <= rule_ids
+    assert report.summary.errors == 5
     assert report.summary.warnings == 3
     secret_finding = next(item for item in report.findings if item.rule_id == "GTC202")
     assert "sk-exampleSecretValue" not in secret_finding.model_dump_json()
@@ -49,3 +58,31 @@ def test_warning_threshold_and_content_policy_are_configurable() -> None:
     assert report.passed is True
     assert "GTC201" not in {finding.rule_id for finding in report.findings}
     assert "GTC202" not in {finding.rule_id for finding in report.findings}
+
+
+def test_structured_content_fixture_passes_with_privacy_warning() -> None:
+    spans = load_otlp_json(ROOT / "examples" / "structured-content.otlp.json")
+
+    report = analyze_spans(spans, source="structured-content.otlp.json", generated_at=NOW)
+
+    assert report.passed is True
+    assert report.summary.errors == 0
+    assert {finding.rule_id for finding in report.findings} == {"GTC201"}
+
+
+def test_malformed_content_reports_exact_paths() -> None:
+    spans = load_otlp_json(ROOT / "examples" / "malformed-content.otlp.json")
+
+    report = analyze_spans(spans, source="malformed-content.otlp.json", generated_at=NOW)
+
+    schema_findings = [finding for finding in report.findings if finding.rule_id == "GTC105"]
+    actual = {(finding.attribute, finding.details["json_path"]) for finding in schema_findings}
+    assert actual == {
+        ("gen_ai.system_instructions", "$"),
+        ("gen_ai.input.messages", "$[0].parts[0].content"),
+        ("gen_ai.input.messages", "$[1].role"),
+        ("gen_ai.input.messages", "$[1].parts"),
+        ("gen_ai.input.messages", "$[2].parts[0].name"),
+        ("gen_ai.output.messages", "$[0].parts[0].response"),
+    }
+    assert any(finding.rule_id == "GTC106" for finding in report.findings)

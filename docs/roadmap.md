@@ -15,11 +15,14 @@ Each day ends with tests, a short log entry, and one reviewable commit.
 
 **Definition of done:** a valid fixture exits `0`, a risky fixture exits `1`, and the test suite passes.
 
-### Day 2 — schema-aware GenAI content
+### Day 2 — schema-aware GenAI content (completed)
 
 - Validate structured input/output messages and system instructions.
 - Report precise JSON paths without echoing sensitive values.
 - Add malformed and multi-part message fixtures.
+
+**Definition of done:** known message parts are validated, extensions remain allowed, malformed
+fixtures report exact paths, and neither tests nor generated reports expose captured values.
 
 ### Day 3 — trace graph integrity
 
