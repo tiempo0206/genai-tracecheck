@@ -25,6 +25,11 @@ class ContentPolicy(StrEnum):
     FORBID = "forbid"
 
 
+class TraceCompleteness(StrEnum):
+    PARTIAL = "partial"
+    COMPLETE = "complete"
+
+
 class SpanRecord(BaseModel):
     """A small, exporter-independent view of an OTLP span."""
 
@@ -49,6 +54,7 @@ class Policy(BaseModel):
     fail_on: FailureThreshold = FailureThreshold.ERROR
     content_policy: ContentPolicy = ContentPolicy.REVIEW
     detect_secret_values: bool = True
+    trace_completeness: TraceCompleteness = TraceCompleteness.PARTIAL
 
 
 class Finding(BaseModel):
@@ -80,5 +86,6 @@ class AnalysisReport(BaseModel):
     source: str
     passed: bool
     fail_on: FailureThreshold
+    trace_completeness: TraceCompleteness
     summary: ReportSummary
     findings: list[Finding]

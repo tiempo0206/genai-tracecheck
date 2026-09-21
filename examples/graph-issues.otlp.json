@@ -1,0 +1,74 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": { "stringValue": "graph-integrity-demo" }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": { "name": "example.tracegraph" },
+          "spans": [
+            {
+              "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "spanId": "1111111111111111",
+              "name": "root",
+              "startTimeUnixNano": "1000",
+              "endTimeUnixNano": "2000"
+            },
+            {
+              "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "spanId": "2222222222222222",
+              "parentSpanId": "1111111111111111",
+              "name": "outside-parent-time",
+              "startTimeUnixNano": "900",
+              "endTimeUnixNano": "2100"
+            },
+            {
+              "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "spanId": "3333333333333333",
+              "parentSpanId": "4444444444444444",
+              "name": "cycle-a",
+              "startTimeUnixNano": "1200",
+              "endTimeUnixNano": "1300"
+            },
+            {
+              "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "spanId": "4444444444444444",
+              "parentSpanId": "3333333333333333",
+              "name": "cycle-b",
+              "startTimeUnixNano": "1200",
+              "endTimeUnixNano": "1300"
+            },
+            {
+              "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "spanId": "5555555555555555",
+              "name": "duplicate-a",
+              "startTimeUnixNano": "1100",
+              "endTimeUnixNano": "1150"
+            },
+            {
+              "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "spanId": "5555555555555555",
+              "name": "duplicate-b",
+              "startTimeUnixNano": "1150",
+              "endTimeUnixNano": "1200"
+            },
+            {
+              "traceId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "spanId": "6666666666666666",
+              "parentSpanId": "9999999999999999",
+              "name": "orphan",
+              "startTimeUnixNano": "1300",
+              "endTimeUnixNano": "1400"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

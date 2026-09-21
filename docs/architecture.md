@@ -17,8 +17,10 @@ rewriting quality rules.
    - OTLP structural integrity (`GTC0xx`)
    - OpenTelemetry GenAI semantic completeness (`GTC1xx`)
    - TraceCheck privacy policy and heuristics (`GTC2xx`)
-5. `analysis.py` sorts findings, counts severities, and evaluates the selected CI threshold.
-6. `cli.py` prints JSON or writes it atomically, then returns a machine-friendly exit code.
+5. `graph_rules.py` groups spans by trace, resolves unique parents, and checks cross-span integrity
+   without recursion.
+6. `analysis.py` combines, sorts, and counts findings before evaluating the selected CI threshold.
+7. `cli.py` prints JSON or writes it atomically, then returns a machine-friendly exit code.
 
 ## Trust boundaries
 
@@ -28,6 +30,16 @@ rewriting quality rules.
 - A schema finding contains only its attribute, JSON path, and violated constraint.
 - Existing report files are not replaced unless `--force` is explicit.
 - Policy rules are labeled separately from upstream semantic-convention checks.
+
+## Partial versus complete trace exports
+
+An OTLP file is not necessarily a complete trace. Sampling, batching, and bounded query windows can
+leave a child span without its parent. TraceCheck therefore defaults to `partial` mode and does not
+report missing parents. In `complete` mode, every valid `parentSpanId` must resolve inside the same
+trace or `GTC006` is emitted.
+
+Duplicate IDs and cycles are errors in both modes. Parent/child time containment is a warning rather
+than an error because asynchronous work can legitimately outlive the initiating parent.
 
 ## Extension points
 

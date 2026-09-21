@@ -66,6 +66,15 @@ def structural_findings(span: SpanRecord) -> Iterable[Finding]:
         yield _finding(span, "GTC001", Severity.ERROR, "traceId must be 32 non-zero hex digits")
     if SPAN_ID.fullmatch(span.span_id) is None or span.span_id == "0" * 16:
         yield _finding(span, "GTC001", Severity.ERROR, "spanId must be 16 non-zero hex digits")
+    if span.parent_span_id is not None and (
+        SPAN_ID.fullmatch(span.parent_span_id) is None or span.parent_span_id == "0" * 16
+    ):
+        yield _finding(
+            span,
+            "GTC001",
+            Severity.ERROR,
+            "parentSpanId must be 16 non-zero hex digits when present",
+        )
 
     if span.start_time_unix_nano is None or span.end_time_unix_nano is None:
         yield _finding(span, "GTC002", Severity.ERROR, "span must include start and end timestamps")

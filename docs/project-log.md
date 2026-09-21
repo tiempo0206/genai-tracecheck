@@ -114,3 +114,49 @@ conventions while keeping all diagnostics safe for logs and CI artifacts.
 
 Implement Day 3 trace-graph integrity: duplicate span IDs, parent cycles, impossible timing
 containment, and policy-aware missing-parent handling for complete versus partial exports.
+
+## 2026-09-21 — Day 3: trace graph integrity
+
+### Objective
+
+Move beyond independent span linting and validate relationships across every span in a trace without
+misclassifying normal partial exports.
+
+### Completed
+
+- Added a per-trace index keyed by `trace_id` and `span_id`.
+- Added `GTC003` for duplicate span IDs inside one trace.
+- Added non-recursive cycle detection and canonical cycle paths through `GTC004`.
+- Added `GTC005` warnings when a child starts before or ends after its resolved parent.
+- Added `GTC006` for missing parents when the export is explicitly declared complete.
+- Added `parentSpanId` format validation to `GTC001`.
+- Added the `--trace-completeness partial|complete` CLI policy and included it in JSON reports.
+- Added graph-problem and partial-export OTLP fixtures.
+- Expanded the suite from 20 to 30 tests, including self-cycles, cross-trace ID reuse, duplicate
+  parents, invalid parent IDs, and failure-threshold integration.
+
+### Engineering decisions
+
+1. **Group by trace first.** Span IDs only need to be unique inside a trace, so identical IDs in two
+   trace IDs are not duplicates.
+2. **Partial is the safe default.** A collector batch or query window can omit a valid parent; absence
+   becomes an error only when the caller promises a complete export.
+3. **Do not recurse through untrusted graphs.** The iterative cycle detector avoids Python recursion
+   limits on deep traces.
+4. **Do not resolve ambiguous parents.** If a parent ID is duplicated, `GTC003` is sufficient; child
+   checks do not pretend one duplicate is authoritative.
+5. **Containment is a warning.** Asynchronous child work may outlive a parent even when the graph is
+   useful, so timing evidence should prompt review without failing the default gate.
+
+### Verification result
+
+- Ruff lint and format checks: passed.
+- Pytest: 30 passed.
+- Graph fixture in partial mode: two errors and one warning.
+- The same fixture in complete mode: one additional missing-parent error.
+- Partial-only fixture: passes by default and fails with `--trace-completeness complete`.
+
+### Next task
+
+Implement Day 4 latency and token consistency: trace-level latency summaries, token aggregation, and
+boundary tests for nested and incomplete traces.

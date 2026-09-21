@@ -43,3 +43,19 @@ def test_cli_accepts_schema_valid_structured_content(capsys) -> None:
     output = json.loads(capsys.readouterr().out)
     assert exit_code == 0
     assert output["summary"]["errors"] == 0
+
+
+def test_cli_trace_completeness_controls_missing_parent(capsys) -> None:
+    fixture = str(ROOT / "examples" / "partial-trace.otlp.json")
+
+    partial_exit = main(["check", fixture])
+    partial_output = json.loads(capsys.readouterr().out)
+    complete_exit = main(["check", fixture, "--trace-completeness", "complete"])
+    complete_output = json.loads(capsys.readouterr().out)
+
+    assert partial_exit == 0
+    assert partial_output["findings"] == []
+    assert partial_output["trace_completeness"] == "partial"
+    assert complete_exit == 1
+    assert complete_output["trace_completeness"] == "complete"
+    assert {finding["rule_id"] for finding in complete_output["findings"]} == {"GTC006"}

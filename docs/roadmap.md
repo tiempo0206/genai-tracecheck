@@ -24,11 +24,14 @@ Each day ends with tests, a short log entry, and one reviewable commit.
 **Definition of done:** known message parts are validated, extensions remain allowed, malformed
 fixtures report exact paths, and neither tests nor generated reports expose captured values.
 
-### Day 3 — trace graph integrity
+### Day 3 — trace graph integrity (completed)
 
 - Build per-trace parent/child indexes.
 - Detect cycles, duplicate IDs, impossible containment, and optionally missing parents.
 - Distinguish complete from partial exports through policy.
+
+**Definition of done:** graph checks are trace-scoped and deterministic, cycle detection is
+non-recursive, partial exports avoid missing-parent noise, and complete exports enforce closure.
 
 ### Day 4 — latency and token consistency
 

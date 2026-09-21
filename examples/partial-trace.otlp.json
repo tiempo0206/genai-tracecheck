@@ -1,0 +1,29 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": { "stringValue": "partial-export-demo" }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": { "name": "example.tracegraph" },
+          "spans": [
+            {
+              "traceId": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "spanId": "cccccccccccccccc",
+              "parentSpanId": "dddddddddddddddd",
+              "name": "exported-child-only",
+              "startTimeUnixNano": "2000",
+              "endTimeUnixNano": "2100"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
