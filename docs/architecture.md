@@ -11,18 +11,21 @@ rewriting quality rules.
 1. `loader.py` parses a canonical OTLP/HTTP JSON request and recursively decodes OTLP `AnyValue`
    attributes.
 2. `models.py` validates the normalized span and report contracts with strict Pydantic models.
-3. `rules.py` applies three independent rule families:
+3. `content_validation.py` parses structured values or JSON strings and validates known GenAI
+   message parts. Its result contains paths and constraints, never captured values.
+4. `rules.py` applies three independent rule families:
    - OTLP structural integrity (`GTC0xx`)
    - OpenTelemetry GenAI semantic completeness (`GTC1xx`)
    - TraceCheck privacy policy and heuristics (`GTC2xx`)
-4. `analysis.py` sorts findings, counts severities, and evaluates the selected CI threshold.
-5. `cli.py` prints JSON or writes it atomically, then returns a machine-friendly exit code.
+5. `analysis.py` sorts findings, counts severities, and evaluates the selected CI threshold.
+6. `cli.py` prints JSON or writes it atomically, then returns a machine-friendly exit code.
 
 ## Trust boundaries
 
 - Input trace files are untrusted. Invalid structure produces a controlled load error.
 - The analyzer never performs network requests.
 - A secret-shaped match is never copied into a finding.
+- A schema finding contains only its attribute, JSON path, and violated constraint.
 - Existing report files are not replaced unless `--force` is explicit.
 - Policy rules are labeled separately from upstream semantic-convention checks.
 
