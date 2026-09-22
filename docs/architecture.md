@@ -8,22 +8,24 @@ rewriting quality rules.
 
 ## Data flow
 
-1. `loader.py` parses a canonical OTLP/HTTP JSON request and recursively decodes OTLP `AnyValue`
+1. `batch.py` safely resolves file, directory, and glob inputs into a canonical sorted set.
+2. `loader.py` parses a canonical OTLP/HTTP JSON request and recursively decodes OTLP `AnyValue`
    attributes.
-2. `models.py` validates the normalized span and report contracts with strict Pydantic models.
-3. `classification.py` identifies GenAI, known model-call, and tool-call spans consistently across
+3. `models.py` validates the normalized span and report contracts with strict Pydantic models.
+4. `classification.py` identifies GenAI, known model-call, and tool-call spans consistently across
    rules and metrics.
-4. `content_validation.py` parses structured values or JSON strings and validates known GenAI
+5. `content_validation.py` parses structured values or JSON strings and validates known GenAI
    message parts. Its result contains paths and constraints, never captured values.
-5. `rules.py` applies three independent rule families:
+6. `rules.py` applies three independent rule families:
    - OTLP structural integrity (`GTC0xx`)
    - OpenTelemetry GenAI semantic completeness (`GTC1xx`)
    - TraceCheck privacy policy and heuristics (`GTC2xx`)
-6. `graph_rules.py` groups spans by trace, resolves unique parents, and checks cross-span integrity
+7. `graph_rules.py` groups spans by trace, resolves unique parents, and checks cross-span integrity
    without recursion.
-7. `metrics.py` derives trace wall time, model/tool call time, and observed token totals.
-8. `analysis.py` combines, sorts, and counts findings before evaluating the selected CI threshold.
-9. `cli.py` prints JSON or writes it atomically, then returns a machine-friendly exit code.
+8. `metrics.py` derives trace wall time, model/tool call time, and observed token totals.
+9. `analysis.py` combines, sorts, and counts findings before evaluating the selected CI threshold.
+10. `batch.py` preserves independent file results and derives aggregate batch counts.
+11. `cli.py` prints JSON or writes it atomically, then returns a machine-friendly exit code.
 
 ## Trust boundaries
 
@@ -32,6 +34,8 @@ rewriting quality rules.
 - A secret-shaped match is never copied into a finding.
 - A schema finding contains only its attribute, JSON path, and violated constraint.
 - Existing report files are not replaced unless `--force` is explicit.
+- A batch output path cannot also be one of its source files, including through a symlink.
+- Directory discovery ignores hidden entries and does not follow symlinked directories.
 - Policy rules are labeled separately from upstream semantic-convention checks.
 
 ## Partial versus complete trace exports
@@ -53,7 +57,7 @@ than an error because asynchronous work can legitimately outlive the initiating 
 
 ## Deliberate first-release limits
 
-- Only OTLP/HTTP JSON files are accepted.
+- Only OTLP/HTTP JSON content is accepted; protobuf and JSON Lines are not yet supported.
 - Partial exports are allowed, so an absent parent span is not yet an error.
 - Observed token totals can double count duplicate or nested instrumentation and are not billing data.
 - Secret detection is heuristic and only scans known content-bearing GenAI attributes.

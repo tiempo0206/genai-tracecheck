@@ -42,11 +42,15 @@ non-recursive, partial exports avoid missing-parent noise, and complete exports 
 **Definition of done:** reports contain deterministic trace/call latency and observed-token summaries,
 subset relationships are checked conservatively, and numeric boundary behavior is covered by tests.
 
-### Day 5 — multi-file and batch analysis
+### Day 5 — multi-file and batch analysis (completed)
 
 - Accept directories and globs safely.
 - Keep deterministic ordering across files.
 - Add aggregate and per-file summaries.
+
+**Definition of done:** overlapping inputs are safely deduplicated and deterministically ordered,
+one bad file does not discard other results, batch reports preserve per-file identity, and the CLI
+distinguishes quality/load failures from invalid command usage.
 
 ### Day 6 — configuration contract
 

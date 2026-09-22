@@ -32,6 +32,10 @@ python -m pip install -e ".[dev]"
 
 genai-tracecheck check examples/valid.otlp.json
 genai-tracecheck check examples/risky.otlp.json --output reports/risky.json
+
+# Recursively analyze a directory and a quoted glob as one deterministic batch.
+genai-tracecheck batch traces/current 'traces/archive/**/*.json' \
+  --output reports/batch.json
 ```
 
 The command returns exit code `0` when the configured quality gate passes, `1` when findings reach
@@ -87,6 +91,7 @@ Output is a versioned JSON document with a summary and stable, sortable findings
 
 ```json
 {
+  "report_type": "single",
   "schema_version": "1.0",
   "passed": false,
   "fail_on": "error",
@@ -118,6 +123,14 @@ Output is a versioned JSON document with a summary and stable, sortable findings
   "findings": []
 }
 ```
+
+The `batch` command accepts one or more files, directories, and quoted glob patterns. Directories
+are searched recursively for `.json` files; hidden entries and symlinked directories are skipped.
+Resolved files are canonicalized, deduplicated, and sorted, so the same inputs produce the same
+file order on repeated CI runs. A batch document uses `"report_type": "batch"` and contains both an
+aggregate `summary` and a `files` array with independent summaries, traces, findings, and controlled
+load errors. Quote glob patterns so TraceCheck—not the shell—expands them consistently. See
+[`docs/batch-analysis.md`](docs/batch-analysis.md) for the exact contract.
 
 ## Architecture
 
@@ -159,9 +172,9 @@ and project releases will record the standards snapshot they target.
 
 ## Project status
 
-Version `0.1.0` is a tested vertical slice: canonical OTLP JSON in, machine-readable findings and
-trace measurements out, with configurable CI behavior. The two-week plan continues with multi-file
-analysis, framework-generated fixtures, SARIF output, benchmarks, and an upstream-ready research note. See
+Version `0.1.0` is a tested vertical slice: canonical OTLP JSON in, deterministic single-file or
+batch reports out, with configurable CI behavior. The two-week plan continues with versioned policy
+configuration, framework-generated fixtures, SARIF output, benchmarks, and an upstream-ready research note. See
 [`docs/roadmap.md`](docs/roadmap.md) and [`docs/project-log.md`](docs/project-log.md).
 
 ## Development
