@@ -11,6 +11,7 @@ def test_cli_prints_json_and_returns_zero_for_valid_trace(capsys) -> None:
 
     output = json.loads(capsys.readouterr().out)
     assert exit_code == 0
+    assert output["report_type"] == "single"
     assert output["passed"] is True
 
 

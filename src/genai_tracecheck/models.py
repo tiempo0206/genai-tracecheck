@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -102,6 +102,7 @@ class TraceMetrics(BaseModel):
 class AnalysisReport(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
+    report_type: Literal["single"] = "single"
     schema_version: str = "1.0"
     generated_at: str
     source: str
@@ -111,3 +112,48 @@ class AnalysisReport(BaseModel):
     summary: ReportSummary
     traces: list[TraceMetrics]
     findings: list[Finding]
+
+
+class BatchFileStatus(StrEnum):
+    ANALYZED = "analyzed"
+    LOAD_ERROR = "load_error"
+
+
+class BatchSummary(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+    files: int
+    analyzed_files: int
+    load_errors: int
+    passed_files: int
+    failed_files: int
+    spans: int
+    genai_spans: int
+    traces: int
+    errors: int
+    warnings: int
+
+
+class BatchFileResult(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+    source: str
+    status: BatchFileStatus
+    passed: bool
+    error: str | None
+    summary: ReportSummary | None
+    traces: list[TraceMetrics]
+    findings: list[Finding]
+
+
+class BatchReport(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+    report_type: Literal["batch"] = "batch"
+    schema_version: str = "1.0"
+    generated_at: str
+    passed: bool
+    fail_on: FailureThreshold
+    trace_completeness: TraceCompleteness
+    summary: BatchSummary
+    files: list[BatchFileResult]

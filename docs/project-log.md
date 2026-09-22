@@ -220,3 +220,53 @@ streaming latency, token totals, and their detailed breakdowns.
 
 Implement Day 5 batch analysis: safe directory/glob inputs, deterministic file ordering, per-file
 summaries, and one aggregate report without overwriting individual source identities.
+
+## 2026-09-23 — Day 5: deterministic batch analysis
+
+### Objective
+
+Scale the single-file analyzer to real trace collections while keeping discovery safe, output order
+reproducible, and failures attributable to an individual source file.
+
+### Completed
+
+- Added a dedicated `batch` command for multiple files, recursively scanned directories, and quoted
+  glob patterns.
+- Canonicalized, deduplicated, and lexicographically sorted all resolved paths.
+- Skipped hidden discovery entries and avoided following directory symlinks.
+- Added strict batch report, aggregate summary, per-file result, and file-status models.
+- Preserved summaries, trace measurements, and findings independently for every analyzed file.
+- Recorded malformed or unreadable files as `load_error` results without aborting the batch.
+- Added an explicit `report_type` discriminator to both single and batch JSON reports.
+- Rejected batch output paths that also resolve to a source file, even when `--force` is present.
+- Added a batch contract document, command examples, architecture notes, and CI exercises.
+- Expanded the suite from 51 to 60 tests.
+
+### Engineering decisions
+
+1. **A separate command keeps compatibility visible.** `check` still accepts exactly one file and
+   emits the existing single-report shape; `batch` has an intentionally distinct aggregate shape.
+2. **Every requested input must match.** A missing path or empty glob returns exit `2` instead of
+   silently producing an incomplete batch.
+3. **Load failure is a batch result.** Once discovery succeeds, a malformed file returns exit `1`
+   and appears beside successful analyses rather than turning the whole operation into a usage
+   error.
+4. **Canonical paths define identity.** The same file reached through a directory, glob, explicit
+   path, or symlink is analyzed once.
+5. **Discovery and analysis stay offline.** Patterns are expanded by Python without shell
+   evaluation or network access.
+
+### Verification result
+
+- Ruff lint and format checks: passed.
+- Pytest: 60 passed.
+- A two-file valid batch passed with stable source ordering and an aggregate summary.
+- A mixed valid/risky batch returned exit `1` while retaining both per-file results.
+- An invalid JSON file became a controlled `load_error`; the valid companion still contributed its
+  spans, traces, and summary.
+- A report path discovered as an input was rejected without modifying the source.
+
+### Next task
+
+Implement Day 6's versioned TOML policy file with strict unknown-key validation, rule
+enable/disable controls, severity overrides, and documented CLI precedence.

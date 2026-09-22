@@ -35,6 +35,8 @@ jobs:
             --output reports/partial-trace.json
           genai-tracecheck check examples/latency-tokens.otlp.json \
             --output reports/latency-tokens.json
+          genai-tracecheck batch examples/valid.otlp.json examples/latency-tokens.otlp.json \
+            --output reports/batch-valid.json
           if genai-tracecheck check examples/risky.otlp.json; then
             echo "Expected risky fixture to fail"
             exit 1
@@ -54,5 +56,9 @@ jobs:
           if genai-tracecheck check examples/partial-trace.otlp.json \
             --trace-completeness complete; then
             echo "Expected complete-trace policy to reject a missing parent"
+            exit 1
+          fi
+          if genai-tracecheck batch examples/valid.otlp.json examples/risky.otlp.json; then
+            echo "Expected a batch containing the risky fixture to fail"
             exit 1
           fi
