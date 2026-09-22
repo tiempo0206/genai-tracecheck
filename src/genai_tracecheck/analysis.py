@@ -5,7 +5,9 @@ from __future__ import annotations
 from collections import Counter
 from datetime import UTC, datetime
 
+from genai_tracecheck.classification import is_genai_span
 from genai_tracecheck.graph_rules import evaluate_trace_graph
+from genai_tracecheck.metrics import summarize_traces
 from genai_tracecheck.models import (
     AnalysisReport,
     FailureThreshold,
@@ -15,7 +17,7 @@ from genai_tracecheck.models import (
     Severity,
     SpanRecord,
 )
-from genai_tracecheck.rules import evaluate_span, is_genai_span
+from genai_tracecheck.rules import evaluate_span
 
 SEVERITY_RANK = {Severity.WARNING: 1, Severity.ERROR: 2}
 THRESHOLD_RANK = {FailureThreshold.WARNING: 1, FailureThreshold.ERROR: 2}
@@ -65,5 +67,6 @@ def analyze_spans(
             errors=counts[Severity.ERROR],
             warnings=counts[Severity.WARNING],
         ),
+        traces=summarize_traces(spans),
         findings=findings,
     )

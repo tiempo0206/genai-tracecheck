@@ -33,6 +33,8 @@ jobs:
             --output reports/structured-content.json
           genai-tracecheck check examples/partial-trace.otlp.json \
             --output reports/partial-trace.json
+          genai-tracecheck check examples/latency-tokens.otlp.json \
+            --output reports/latency-tokens.json
           if genai-tracecheck check examples/risky.otlp.json; then
             echo "Expected risky fixture to fail"
             exit 1
@@ -43,6 +45,10 @@ jobs:
           fi
           if genai-tracecheck check examples/graph-issues.otlp.json; then
             echo "Expected graph issues fixture to fail"
+            exit 1
+          fi
+          if genai-tracecheck check examples/inconsistent-usage.otlp.json; then
+            echo "Expected inconsistent usage fixture to fail"
             exit 1
           fi
           if genai-tracecheck check examples/partial-trace.otlp.json \

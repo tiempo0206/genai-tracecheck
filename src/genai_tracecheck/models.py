@@ -78,6 +78,27 @@ class ReportSummary(BaseModel):
     warnings: int
 
 
+class TraceMetrics(BaseModel):
+    """Deterministic measurements derived from one trace."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+    trace_id: str
+    spans: int
+    genai_spans: int
+    start_time_unix_nano: int | None
+    end_time_unix_nano: int | None
+    trace_duration_ms: float | None
+    model_calls: int
+    model_call_duration_ms: float
+    tool_calls: int
+    tool_call_duration_ms: float
+    tokenized_spans: int
+    observed_input_tokens: int
+    observed_output_tokens: int
+    observed_total_tokens: int
+
+
 class AnalysisReport(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
@@ -88,4 +109,5 @@ class AnalysisReport(BaseModel):
     fail_on: FailureThreshold
     trace_completeness: TraceCompleteness
     summary: ReportSummary
+    traces: list[TraceMetrics]
     findings: list[Finding]

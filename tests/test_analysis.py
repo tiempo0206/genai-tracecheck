@@ -108,3 +108,31 @@ def test_graph_fixture_changes_with_completeness_policy() -> None:
     }
     assert complete_report.summary.errors == 3
     assert "GTC006" in {finding.rule_id for finding in complete_report.findings}
+
+
+def test_latency_token_fixture_produces_trace_metrics_without_findings() -> None:
+    spans = load_otlp_json(ROOT / "examples" / "latency-tokens.otlp.json")
+
+    report = analyze_spans(spans, source="latency-tokens.otlp.json", generated_at=NOW)
+
+    assert report.passed is True
+    assert report.findings == []
+    assert len(report.traces) == 1
+    trace = report.traces[0]
+    assert trace.trace_duration_ms == 5_000.0
+    assert trace.model_calls == 1
+    assert trace.model_call_duration_ms == 2_000.0
+    assert trace.tool_calls == 1
+    assert trace.tool_call_duration_ms == 500.0
+    assert trace.observed_total_tokens == 130
+
+
+def test_inconsistent_usage_fixture_reports_latency_token_and_tool_rules() -> None:
+    spans = load_otlp_json(ROOT / "examples" / "inconsistent-usage.otlp.json")
+
+    report = analyze_spans(spans, source="inconsistent-usage.otlp.json", generated_at=NOW)
+
+    assert report.passed is False
+    assert report.summary.errors == 3
+    assert report.summary.warnings == 1
+    assert {finding.rule_id for finding in report.findings} == {"GTC107", "GTC108", "GTC109"}

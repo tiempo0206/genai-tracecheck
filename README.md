@@ -53,7 +53,7 @@ genai-tracecheck check trace.json --content-policy allow --no-secret-detection
 genai-tracecheck check trace.json --trace-completeness complete
 ```
 
-## Initial rule set
+## Rule set
 
 | Rule | Type | Default severity | What it checks |
 | --- | --- | --- | --- |
@@ -69,6 +69,9 @@ genai-tracecheck check trace.json --trace-completeness complete
 | `GTC104` | GenAI semantics | error | Token usage values are non-negative integers |
 | `GTC105` | GenAI content schema | error | Messages, instructions, and known part types have valid structure |
 | `GTC106` | GenAI content schema | warning | Output messages do not use deprecated `finish_reason` |
+| `GTC107` | GenAI latency | error | Time to first chunk is finite, non-negative, and inside span duration |
+| `GTC108` | GenAI token usage | error | Token breakdown subsets do not exceed their aggregate totals |
+| `GTC109` | GenAI token usage | warning | `execute_tool` spans do not report token usage |
 | `GTC201` | Local privacy policy | warning/error | Captured GenAI content is surfaced for review or forbidden |
 | `GTC202` | Local privacy heuristic | error | Secret-shaped values do not appear in captured content |
 
@@ -94,6 +97,24 @@ Output is a versioned JSON document with a summary and stable, sortable findings
     "errors": 5,
     "warnings": 3
   },
+  "traces": [
+    {
+      "trace_id": "11111111111111111111111111111111",
+      "spans": 1,
+      "genai_spans": 1,
+      "start_time_unix_nano": null,
+      "end_time_unix_nano": null,
+      "trace_duration_ms": null,
+      "model_calls": 0,
+      "model_call_duration_ms": 0.0,
+      "tool_calls": 0,
+      "tool_call_duration_ms": 0.0,
+      "tokenized_spans": 0,
+      "observed_input_tokens": 0,
+      "observed_output_tokens": 0,
+      "observed_total_tokens": 0
+    }
+  ],
   "findings": []
 }
 ```
@@ -101,9 +122,9 @@ Output is a versioned JSON document with a summary and stable, sortable findings
 ## Architecture
 
 ```text
-OTLP JSON -> strict loader -> normalized spans -> per-span rules -> trace graph -> report
-                                      |                 |               |
-                               OTel semantics    privacy policy    cross-span rules
+OTLP JSON -> strict loader -> normalized spans -> rules + trace graph -> metrics -> report
+                                      |                  |              |
+                               OTel semantics       privacy policy   latency/tokens
 ```
 
 The parser, data contracts, content-schema validator, rules, and command-line boundary are separate
@@ -119,6 +140,10 @@ Trace graph checks are scoped by `trace_id`. Missing parents are ignored in the 
 mode because collectors commonly export only part of a trace. Use `--trace-completeness complete`
 when the input is expected to contain the full graph.
 
+Each report also includes per-trace wall-clock duration, summed model/tool-call durations, and
+observed input/output token totals. See [`docs/metrics.md`](docs/metrics.md) for exact definitions and
+the important overlap and double-counting limitations.
+
 ## Standards baseline
 
 The first release follows the current OpenTelemetry GenAI attribute registry and span guidance,
@@ -127,16 +152,16 @@ including the newer structured `gen_ai.input.messages`, `gen_ai.output.messages`
 
 - [OpenTelemetry GenAI semantic conventions](https://github.com/open-telemetry/semantic-conventions-genai)
 - [GenAI span conventions](https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-spans.md)
-- [GenAI attribute registry](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/registry/attributes/gen-ai.md)
+- [GenAI attribute registry](https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/registry/attributes/gen-ai.md)
 
 Semantic conventions evolve. Each rule should cite its upstream basis in tests or documentation,
 and project releases will record the standards snapshot they target.
 
 ## Project status
 
-Version `0.1.0` is a tested vertical slice: canonical OTLP JSON in, machine-readable findings out,
-with configurable CI behavior. The two-week plan adds multi-file analysis, trace-graph checks,
-framework-generated fixtures, SARIF output, benchmarks, and an upstream-ready research note. See
+Version `0.1.0` is a tested vertical slice: canonical OTLP JSON in, machine-readable findings and
+trace measurements out, with configurable CI behavior. The two-week plan continues with multi-file
+analysis, framework-generated fixtures, SARIF output, benchmarks, and an upstream-ready research note. See
 [`docs/roadmap.md`](docs/roadmap.md) and [`docs/project-log.md`](docs/project-log.md).
 
 ## Development

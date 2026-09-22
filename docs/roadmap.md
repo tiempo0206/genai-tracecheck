@@ -33,11 +33,14 @@ fixtures report exact paths, and neither tests nor generated reports expose capt
 **Definition of done:** graph checks are trace-scoped and deterministic, cycle detection is
 non-recursive, partial exports avoid missing-parent noise, and complete exports enforce closure.
 
-### Day 4 — latency and token consistency
+### Day 4 — latency and token consistency (completed)
 
 - Compute model-call and tool-call latency summaries.
 - Verify non-negative durations and trace-level token aggregation.
 - Add property-based boundary tests if the dependency cost is justified.
+
+**Definition of done:** reports contain deterministic trace/call latency and observed-token summaries,
+subset relationships are checked conservatively, and numeric boundary behavior is covered by tests.
 
 ### Day 5 — multi-file and batch analysis
 
