@@ -160,3 +160,63 @@ misclassifying normal partial exports.
 
 Implement Day 4 latency and token consistency: trace-level latency summaries, token aggregation, and
 boundary tests for nested and incomplete traces.
+
+## 2026-09-22 — Day 4: latency and token consistency
+
+### Objective
+
+Turn valid spans into useful per-trace measurements and detect impossible relationships between
+streaming latency, token totals, and their detailed breakdowns.
+
+### Upstream research
+
+- Confirmed `gen_ai.response.time_to_first_chunk` is measured in seconds from request issuance to
+  the first streamed chunk.
+- Confirmed input/output totals include modality-specific details rather than being separate from
+  them.
+- Confirmed cache-read, cache-write, and reasoning counts are subsets of larger totals.
+- Confirmed current naming uses `gen_ai.usage.cache_write.input_tokens` after the upstream rename
+  from `cache_creation`.
+- Confirmed `execute_tool` spans should not report token usage.
+
+### Completed
+
+- Added a strict `TraceMetrics` report contract and deterministic per-trace metric generation.
+- Added trace wall-clock duration and summed model/tool-call durations in milliseconds.
+- Added observed input, output, and combined token totals plus the number of tokenized spans.
+- Added `GTC107` for invalid or impossible time-to-first-chunk values.
+- Added `GTC108` for token subsets that exceed their enclosing aggregate.
+- Added `GTC109` when `execute_tool` spans report token usage.
+- Limited provider/model completeness warnings to model operations or spans with a missing operation,
+  avoiding false warnings on valid tool spans.
+- Added valid and inconsistent latency/token OTLP fixtures and a metrics contract document.
+- Expanded the suite from 30 to 51 tests.
+
+### Engineering decisions
+
+1. **Observed, not billed.** Trace totals are direct sums of valid exported attributes. The report
+   does not claim to deduplicate nested instrumentation or reproduce an invoice.
+2. **Wall time and call time remain separate.** Parallel calls can make summed model duration larger
+   than trace wall time; both values are useful when named precisely.
+3. **Subset checks, not equality checks.** Providers may expose only some modalities or breakdowns,
+   so `component sum < total` is valid while `component sum > total` is impossible.
+4. **Invalid values do not enter arithmetic.** `GTC104` reports them and metrics omit them rather than
+   guessing a correction.
+5. **No Hypothesis dependency yet.** The current numeric state space is small and explicit
+   parameterized tests cover negative, zero, exact-boundary, out-of-range, Boolean, infinite, and
+   NaN cases. Property-based testing will be reconsidered when configuration creates combinatorial
+   rule interactions.
+
+### Verification result
+
+- Ruff lint and format checks: passed.
+- Pytest: 51 passed.
+- Valid latency/token fixture: zero findings; 5,000 ms trace time, 2,000 ms model-call time, 500 ms
+  tool-call time, and 130 observed tokens.
+- Inconsistent fixture: three errors (`GTC107`, two `GTC108`) and one `GTC109` warning.
+- Existing risky fixture remains stable at five errors and three warnings.
+
+### Next task
+
+Implement Day 5 batch analysis: safe directory/glob inputs, deterministic file ordering, per-file
+summaries, and one aggregate report without overwriting individual source identities.

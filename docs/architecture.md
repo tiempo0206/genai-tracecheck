@@ -11,16 +11,19 @@ rewriting quality rules.
 1. `loader.py` parses a canonical OTLP/HTTP JSON request and recursively decodes OTLP `AnyValue`
    attributes.
 2. `models.py` validates the normalized span and report contracts with strict Pydantic models.
-3. `content_validation.py` parses structured values or JSON strings and validates known GenAI
+3. `classification.py` identifies GenAI, known model-call, and tool-call spans consistently across
+   rules and metrics.
+4. `content_validation.py` parses structured values or JSON strings and validates known GenAI
    message parts. Its result contains paths and constraints, never captured values.
-4. `rules.py` applies three independent rule families:
+5. `rules.py` applies three independent rule families:
    - OTLP structural integrity (`GTC0xx`)
    - OpenTelemetry GenAI semantic completeness (`GTC1xx`)
    - TraceCheck privacy policy and heuristics (`GTC2xx`)
-5. `graph_rules.py` groups spans by trace, resolves unique parents, and checks cross-span integrity
+6. `graph_rules.py` groups spans by trace, resolves unique parents, and checks cross-span integrity
    without recursion.
-6. `analysis.py` combines, sorts, and counts findings before evaluating the selected CI threshold.
-7. `cli.py` prints JSON or writes it atomically, then returns a machine-friendly exit code.
+7. `metrics.py` derives trace wall time, model/tool call time, and observed token totals.
+8. `analysis.py` combines, sorts, and counts findings before evaluating the selected CI threshold.
+9. `cli.py` prints JSON or writes it atomically, then returns a machine-friendly exit code.
 
 ## Trust boundaries
 
@@ -44,8 +47,7 @@ than an error because asynchronous work can legitimately outlive the initiating 
 ## Extension points
 
 - **Readers:** OTLP protobuf, JSON Lines, and collector endpoints.
-- **Rules:** parent/child graph integrity, latency consistency, token aggregation, and schema-aware
-  validation of structured messages.
+- **Rules:** response-stream timing, provider-specific invariants, and richer graph policies.
 - **Outputs:** SARIF for code scanning and HTML for portfolio demonstrations.
 - **Adapters:** reproducible fixtures emitted by multiple GenAI instrumentation libraries.
 
@@ -53,6 +55,7 @@ than an error because asynchronous work can legitimately outlive the initiating 
 
 - Only OTLP/HTTP JSON files are accepted.
 - Partial exports are allowed, so an absent parent span is not yet an error.
+- Observed token totals can double count duplicate or nested instrumentation and are not billing data.
 - Secret detection is heuristic and only scans known content-bearing GenAI attributes.
 - Experimental OpenTelemetry attributes may change; TraceCheck does not invent proposed attributes
   or treat unaccepted proposals as normative.
