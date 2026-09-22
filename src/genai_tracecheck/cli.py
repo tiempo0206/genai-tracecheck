@@ -13,7 +13,12 @@ from pathlib import Path
 from genai_tracecheck import __version__
 from genai_tracecheck.analysis import analyze_spans
 from genai_tracecheck.loader import TraceLoadError, load_otlp_json
-from genai_tracecheck.models import ContentPolicy, FailureThreshold, Policy
+from genai_tracecheck.models import (
+    ContentPolicy,
+    FailureThreshold,
+    Policy,
+    TraceCompleteness,
+)
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -44,6 +49,12 @@ def _build_parser() -> argparse.ArgumentParser:
         "--no-secret-detection",
         action="store_true",
         help="disable heuristic secret-pattern detection",
+    )
+    check.add_argument(
+        "--trace-completeness",
+        choices=[item.value for item in TraceCompleteness],
+        default=TraceCompleteness.PARTIAL.value,
+        help="treat input as a partial or complete trace export (default: partial)",
     )
     return parser
 
@@ -84,6 +95,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             fail_on=FailureThreshold(args.fail_on),
             content_policy=ContentPolicy(args.content_policy),
             detect_secret_values=not args.no_secret_detection,
+            trace_completeness=TraceCompleteness(args.trace_completeness),
         )
         report = analyze_spans(spans, source=str(args.input), policy=policy)
         document = json.dumps(report.model_dump(mode="json"), indent=2, ensure_ascii=False) + "\n"

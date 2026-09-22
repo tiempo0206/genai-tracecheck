@@ -2,12 +2,13 @@
 
 from genai_tracecheck.analysis import analyze_spans
 from genai_tracecheck.loader import TraceLoadError, load_otlp_json
-from genai_tracecheck.models import AnalysisReport, Policy, SpanRecord
+from genai_tracecheck.models import AnalysisReport, Policy, SpanRecord, TraceCompleteness
 
 __all__ = [
     "AnalysisReport",
     "Policy",
     "SpanRecord",
+    "TraceCompleteness",
     "TraceLoadError",
     "analyze_spans",
     "load_otlp_json",

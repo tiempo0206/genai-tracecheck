@@ -48,6 +48,9 @@ genai-tracecheck check trace.json --content-policy forbid
 
 # Inspect a trusted synthetic fixture without secret-pattern heuristics.
 genai-tracecheck check trace.json --content-policy allow --no-secret-detection
+
+# Require every non-root span to have its parent in this export.
+genai-tracecheck check trace.json --trace-completeness complete
 ```
 
 ## Initial rule set
@@ -56,6 +59,10 @@ genai-tracecheck check trace.json --content-policy allow --no-secret-detection
 | --- | --- | --- | --- |
 | `GTC001` | OTLP structure | error | Trace and span identifiers are valid, non-zero hex IDs |
 | `GTC002` | OTLP structure | error | Timestamps exist and the span does not end before it starts |
+| `GTC003` | Trace graph | error | A span ID is unique within its trace |
+| `GTC004` | Trace graph | error | Parent relationships do not contain a cycle |
+| `GTC005` | Trace graph | warning | A child lifetime is contained by its parent lifetime |
+| `GTC006` | Trace graph policy | error | Complete exports contain every referenced parent span |
 | `GTC101` | GenAI semantics | error | `gen_ai.operation.name` is present |
 | `GTC102` | GenAI semantics | warning | `gen_ai.provider.name` is present when available |
 | `GTC103` | GenAI semantics | warning | A request or response model is recorded when available |
@@ -80,6 +87,7 @@ Output is a versioned JSON document with a summary and stable, sortable findings
   "schema_version": "1.0",
   "passed": false,
   "fail_on": "error",
+  "trace_completeness": "partial",
   "summary": {
     "spans": 1,
     "genai_spans": 1,
@@ -93,9 +101,9 @@ Output is a versioned JSON document with a summary and stable, sortable findings
 ## Architecture
 
 ```text
-OTLP JSON -> strict loader -> normalized spans -> rule families -> versioned report -> CI exit code
-                                      |               |
-                               OTel semantics    local privacy policy
+OTLP JSON -> strict loader -> normalized spans -> per-span rules -> trace graph -> report
+                                      |                 |               |
+                               OTel semantics    privacy policy    cross-span rules
 ```
 
 The parser, data contracts, content-schema validator, rules, and command-line boundary are separate
@@ -106,6 +114,10 @@ independently testable. See
 Schema failures report paths such as `$[1].parts[0].name`, never the captured value. Known official
 part types—including text, reasoning, tool calls, tool responses, blobs, files, URIs, and server-side
 tools—receive type-specific checks. Unknown part types remain valid extension points.
+
+Trace graph checks are scoped by `trace_id`. Missing parents are ignored in the default `partial`
+mode because collectors commonly export only part of a trace. Use `--trace-completeness complete`
+when the input is expected to contain the full graph.
 
 ## Standards baseline
 

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from genai_tracecheck.analysis import analyze_spans
 from genai_tracecheck.loader import load_otlp_json
-from genai_tracecheck.models import ContentPolicy, FailureThreshold, Policy
+from genai_tracecheck.models import ContentPolicy, FailureThreshold, Policy, TraceCompleteness
 
 ROOT = Path(__file__).parents[1]
 NOW = datetime(2026, 9, 19, tzinfo=UTC)
@@ -86,3 +86,25 @@ def test_malformed_content_reports_exact_paths() -> None:
         ("gen_ai.output.messages", "$[0].parts[0].response"),
     }
     assert any(finding.rule_id == "GTC106" for finding in report.findings)
+
+
+def test_graph_fixture_changes_with_completeness_policy() -> None:
+    spans = load_otlp_json(ROOT / "examples" / "graph-issues.otlp.json")
+
+    partial_report = analyze_spans(spans, source="graph-issues.otlp.json", generated_at=NOW)
+    complete_report = analyze_spans(
+        spans,
+        source="graph-issues.otlp.json",
+        policy=Policy(trace_completeness=TraceCompleteness.COMPLETE),
+        generated_at=NOW,
+    )
+
+    assert partial_report.summary.errors == 2
+    assert partial_report.summary.warnings == 1
+    assert {finding.rule_id for finding in partial_report.findings} == {
+        "GTC003",
+        "GTC004",
+        "GTC005",
+    }
+    assert complete_report.summary.errors == 3
+    assert "GTC006" in {finding.rule_id for finding in complete_report.findings}

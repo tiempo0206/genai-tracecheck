@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import Counter
 from datetime import UTC, datetime
 
+from genai_tracecheck.graph_rules import evaluate_trace_graph
 from genai_tracecheck.models import (
     AnalysisReport,
     FailureThreshold,
@@ -38,8 +39,9 @@ def analyze_spans(
     generated_at: datetime | None = None,
 ) -> AnalysisReport:
     active_policy = policy or Policy()
+    span_findings = [finding for span in spans for finding in evaluate_span(span, active_policy)]
     findings = sorted(
-        (finding for span in spans for finding in evaluate_span(span, active_policy)),
+        [*span_findings, *evaluate_trace_graph(spans, active_policy)],
         key=_sort_key,
     )
     counts = Counter(finding.severity for finding in findings)
@@ -56,6 +58,7 @@ def analyze_spans(
         source=source,
         passed=passed,
         fail_on=active_policy.fail_on,
+        trace_completeness=active_policy.trace_completeness,
         summary=ReportSummary(
             spans=len(spans),
             genai_spans=sum(is_genai_span(span) for span in spans),
