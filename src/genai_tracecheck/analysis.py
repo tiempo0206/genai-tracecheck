@@ -33,6 +33,18 @@ def _sort_key(finding: Finding) -> tuple[object, ...]:
     )
 
 
+def _apply_rule_policy(findings: list[Finding], policy: Policy) -> list[Finding]:
+    configured: list[Finding] = []
+    for finding in findings:
+        if finding.rule_id in policy.disabled_rules:
+            continue
+        severity = policy.severity_overrides.get(finding.rule_id)
+        configured.append(
+            finding if severity is None else finding.model_copy(update={"severity": severity})
+        )
+    return configured
+
+
 def analyze_spans(
     spans: list[SpanRecord],
     *,
@@ -42,10 +54,8 @@ def analyze_spans(
 ) -> AnalysisReport:
     active_policy = policy or Policy()
     span_findings = [finding for span in spans for finding in evaluate_span(span, active_policy)]
-    findings = sorted(
-        [*span_findings, *evaluate_trace_graph(spans, active_policy)],
-        key=_sort_key,
-    )
+    raw_findings = [*span_findings, *evaluate_trace_graph(spans, active_policy)]
+    findings = sorted(_apply_rule_policy(raw_findings, active_policy), key=_sort_key)
     counts = Counter(finding.severity for finding in findings)
 
     if active_policy.fail_on is FailureThreshold.NEVER:
@@ -60,7 +70,11 @@ def analyze_spans(
         source=source,
         passed=passed,
         fail_on=active_policy.fail_on,
+        content_policy=active_policy.content_policy,
+        detect_secret_values=active_policy.detect_secret_values,
         trace_completeness=active_policy.trace_completeness,
+        disabled_rules=sorted(active_policy.disabled_rules),
+        severity_overrides=dict(sorted(active_policy.severity_overrides.items())),
         summary=ReportSummary(
             spans=len(spans),
             genai_spans=sum(is_genai_span(span) for span in spans),

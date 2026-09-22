@@ -148,7 +148,11 @@ def analyze_batch(
         generated_at=timestamp.isoformat().replace("+00:00", "Z"),
         passed=passed_files == len(results),
         fail_on=active_policy.fail_on,
+        content_policy=active_policy.content_policy,
+        detect_secret_values=active_policy.detect_secret_values,
         trace_completeness=active_policy.trace_completeness,
+        disabled_rules=sorted(active_policy.disabled_rules),
+        severity_overrides=dict(sorted(active_policy.severity_overrides.items())),
         summary=BatchSummary(
             files=len(results),
             analyzed_files=len(analyzed),

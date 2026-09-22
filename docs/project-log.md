@@ -270,3 +270,54 @@ reproducible, and failures attributable to an individual source file.
 
 Implement Day 6's versioned TOML policy file with strict unknown-key validation, rule
 enable/disable controls, severity overrides, and documented CLI precedence.
+
+## 2026-09-23 — Day 6: versioned configuration contract
+
+### Objective
+
+Make policy reusable and reviewable across developer machines and CI while ensuring configuration
+mistakes fail visibly instead of silently weakening the quality gate.
+
+### Completed
+
+- Added an explicit `--config` option to both single-file and batch commands.
+- Added a version `1.0` TOML contract for failure threshold, captured-content policy, secret
+  detection, and partial/complete trace handling.
+- Added per-rule `enabled` controls and `warning`/`error` severity overrides.
+- Added a supported-rule catalog and validation for both TOML and programmatic policies.
+- Rejected unknown top-level keys, policy keys, rule keys, rule IDs, values, and schema versions.
+- Rejected empty rule entries and contradictory disabled-plus-severity settings.
+- Applied rule settings centrally before sorting, summary counts, and quality-gate evaluation so
+  `check` and `batch` share identical behavior.
+- Added symmetric `--secret-detection` and `--no-secret-detection` CLI overrides.
+- Recorded all effective policy and rule settings in JSON reports for auditability.
+- Added a reviewed example policy, configuration reference, architecture notes, and CI exercise.
+- Expanded the suite from 60 to 73 tests.
+
+### Engineering decisions
+
+1. **No implicit discovery.** Callers must pass `--config`; results cannot change because a new file
+   appears in a parent directory.
+2. **Strict means no silent typos.** Unknown keys and rule IDs return exit `2`, preventing a
+   misspelled exception from looking active.
+3. **Precedence is field-wise.** Built-ins are overlaid by TOML and then by explicit CLI flags, so
+   one CLI override does not erase unrelated file settings.
+4. **Rule policy is centralized.** Disablement and severity changes happen after all rule families
+   emit findings but before counts, ordering, and pass/fail evaluation.
+5. **Reports contain effective settings, not config paths.** This makes decisions reproducible
+   without embedding machine-specific filesystem details.
+
+### Verification result
+
+- Ruff lint and format checks: passed.
+- Pytest: 73 passed.
+- A disabled `GTC201` disappeared from findings and summary counts.
+- Promoting `GTC201` to error changed the finding, counts, ordering, and default quality-gate result.
+- Explicit `--fail-on` and `--secret-detection` flags overrode file values independently.
+- Invalid TOML, unsupported versions, unknown keys/rules, and contradictory overrides produced
+  controlled configuration errors.
+
+### Next task
+
+Perform Day 7 release-candidate review: exercise mutation-oriented edge cases, measure coverage,
+improve CLI/error ergonomics, and decide whether the evidence supports a `v0.2.0` tag.

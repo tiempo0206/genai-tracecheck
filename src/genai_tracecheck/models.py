@@ -5,7 +5,9 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+from genai_tracecheck.rule_catalog import SUPPORTED_RULE_IDS
 
 
 class Severity(StrEnum):
@@ -55,6 +57,31 @@ class Policy(BaseModel):
     content_policy: ContentPolicy = ContentPolicy.REVIEW
     detect_secret_values: bool = True
     trace_completeness: TraceCompleteness = TraceCompleteness.PARTIAL
+    disabled_rules: frozenset[str] = Field(default_factory=frozenset)
+    severity_overrides: dict[str, Severity] = Field(default_factory=dict)
+
+    @field_validator("disabled_rules")
+    @classmethod
+    def _validate_disabled_rules(cls, value: frozenset[str]) -> frozenset[str]:
+        unknown = sorted(value - SUPPORTED_RULE_IDS)
+        if unknown:
+            raise ValueError(f"unsupported rule ID(s): {', '.join(unknown)}")
+        return value
+
+    @field_validator("severity_overrides")
+    @classmethod
+    def _validate_severity_rules(cls, value: dict[str, Severity]) -> dict[str, Severity]:
+        unknown = sorted(set(value) - SUPPORTED_RULE_IDS)
+        if unknown:
+            raise ValueError(f"unsupported rule ID(s): {', '.join(unknown)}")
+        return value
+
+    @model_validator(mode="after")
+    def _validate_rule_settings(self) -> Policy:
+        conflicts = sorted(self.disabled_rules & set(self.severity_overrides))
+        if conflicts:
+            raise ValueError(f"disabled rule(s) cannot override severity: {', '.join(conflicts)}")
+        return self
 
 
 class Finding(BaseModel):
@@ -108,7 +135,11 @@ class AnalysisReport(BaseModel):
     source: str
     passed: bool
     fail_on: FailureThreshold
+    content_policy: ContentPolicy
+    detect_secret_values: bool
     trace_completeness: TraceCompleteness
+    disabled_rules: list[str]
+    severity_overrides: dict[str, Severity]
     summary: ReportSummary
     traces: list[TraceMetrics]
     findings: list[Finding]
@@ -154,6 +185,10 @@ class BatchReport(BaseModel):
     generated_at: str
     passed: bool
     fail_on: FailureThreshold
+    content_policy: ContentPolicy
+    detect_secret_values: bool
     trace_completeness: TraceCompleteness
+    disabled_rules: list[str]
+    severity_overrides: dict[str, Severity]
     summary: BatchSummary
     files: list[BatchFileResult]

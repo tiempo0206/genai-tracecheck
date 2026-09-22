@@ -8,24 +8,26 @@ rewriting quality rules.
 
 ## Data flow
 
-1. `batch.py` safely resolves file, directory, and glob inputs into a canonical sorted set.
-2. `loader.py` parses a canonical OTLP/HTTP JSON request and recursively decodes OTLP `AnyValue`
+1. `config.py` strictly validates an explicit, versioned TOML policy and resolves rule controls.
+2. `batch.py` safely resolves file, directory, and glob inputs into a canonical sorted set.
+3. `loader.py` parses a canonical OTLP/HTTP JSON request and recursively decodes OTLP `AnyValue`
    attributes.
-3. `models.py` validates the normalized span and report contracts with strict Pydantic models.
-4. `classification.py` identifies GenAI, known model-call, and tool-call spans consistently across
+4. `models.py` validates the normalized span and report contracts with strict Pydantic models.
+5. `classification.py` identifies GenAI, known model-call, and tool-call spans consistently across
    rules and metrics.
-5. `content_validation.py` parses structured values or JSON strings and validates known GenAI
+6. `content_validation.py` parses structured values or JSON strings and validates known GenAI
    message parts. Its result contains paths and constraints, never captured values.
-6. `rules.py` applies three independent rule families:
+7. `rules.py` applies three independent rule families:
    - OTLP structural integrity (`GTC0xx`)
    - OpenTelemetry GenAI semantic completeness (`GTC1xx`)
    - TraceCheck privacy policy and heuristics (`GTC2xx`)
-7. `graph_rules.py` groups spans by trace, resolves unique parents, and checks cross-span integrity
+8. `graph_rules.py` groups spans by trace, resolves unique parents, and checks cross-span integrity
    without recursion.
-8. `metrics.py` derives trace wall time, model/tool call time, and observed token totals.
-9. `analysis.py` combines, sorts, and counts findings before evaluating the selected CI threshold.
-10. `batch.py` preserves independent file results and derives aggregate batch counts.
-11. `cli.py` prints JSON or writes it atomically, then returns a machine-friendly exit code.
+9. `metrics.py` derives trace wall time, model/tool call time, and observed token totals.
+10. `analysis.py` applies rule configuration, then sorts and counts findings before evaluating the
+    selected CI threshold.
+11. `batch.py` preserves independent file results and derives aggregate batch counts.
+12. `cli.py` prints JSON or writes it atomically, then returns a machine-friendly exit code.
 
 ## Trust boundaries
 
@@ -36,6 +38,7 @@ rewriting quality rules.
 - Existing report files are not replaced unless `--force` is explicit.
 - A batch output path cannot also be one of its source files, including through a symlink.
 - Directory discovery ignores hidden entries and does not follow symlinked directories.
+- Configuration is explicit, versioned, and rejects unknown fields or rule IDs.
 - Policy rules are labeled separately from upstream semantic-convention checks.
 
 ## Partial versus complete trace exports
