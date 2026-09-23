@@ -41,6 +41,16 @@ genai-tracecheck batch traces/current 'traces/archive/**/*.json' \
 The command returns exit code `0` when the configured quality gate passes, `1` when findings reach
 the failure threshold, and `2` for invalid input or CLI errors. This makes it directly usable in CI.
 
+Two frozen fixtures are generated through real OpenAI and LangChain instrumentation with local
+mock/fake backends. Analyze them together with:
+
+```bash
+genai-tracecheck batch 'examples/framework/*.otlp.json'
+```
+
+The generator, exact dependency versions, sanitization steps, and observed semantic differences are
+documented in [`docs/framework-fixtures.md`](docs/framework-fixtures.md).
+
 Useful policy controls:
 
 ```bash
@@ -185,9 +195,9 @@ and project releases will record the standards snapshot they target.
 ## Project status
 
 Version `0.2.0` is a tested vertical slice: canonical OTLP JSON in, deterministic single-file or
-batch reports out, with reusable policy configuration and auditable CI behavior. The two-week plan
-continues with framework-generated fixtures, SARIF output, benchmarks, and an upstream-ready
-research note. See
+batch reports out, with reusable policy configuration and auditable CI behavior. Framework-generated
+fixtures now cover OpenAI and LangChain instrumentation; the two-week plan continues with a
+compatibility matrix, SARIF output, benchmarks, and an upstream-ready research note. See
 [`docs/roadmap.md`](docs/roadmap.md) and [`docs/project-log.md`](docs/project-log.md).
 
 ## Development

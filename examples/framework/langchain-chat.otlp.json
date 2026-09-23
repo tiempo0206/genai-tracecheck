@@ -1,0 +1,65 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "tracecheck-fixture"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "opentelemetry.util.genai.handler",
+            "version": "1.1b0"
+          },
+          "spans": [
+            {
+              "traceId": "c542e50bec6c9ac6ae53bdc3ea0719a6",
+              "spanId": "ef224b381b8a8545",
+              "name": "chat fixture-langchain-model",
+              "startTimeUnixNano": "1760000000000000000",
+              "endTimeUnixNano": "1760000000010000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.input.messages",
+                  "value": {
+                    "stringValue": "[{\"role\":\"user\",\"parts\":[{\"content\":\"What is two plus two?\",\"type\":\"text\"}]}]"
+                  }
+                },
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.output.messages",
+                  "value": {
+                    "stringValue": "[{\"role\":\"assistant\",\"parts\":[{\"content\":\"The answer is four.\",\"type\":\"text\"}],\"finish_reason\":\"\"}]"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "fixturechatmodel"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "fixture-langchain-model"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
