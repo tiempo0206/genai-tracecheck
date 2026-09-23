@@ -25,7 +25,7 @@ jobs:
       - name: Lint
         run: ruff check . && ruff format --check .
       - name: Test
-        run: pytest
+        run: coverage run -m pytest && coverage report
       - name: Exercise the CLI
         run: |
           genai-tracecheck check examples/valid.otlp.json --output reports/valid.json
@@ -69,3 +69,10 @@ jobs:
             echo "Expected explicit warning threshold to override configuration"
             exit 1
           fi
+      - name: Build distributions
+        run: python -m build
+      - name: Smoke-test the wheel
+        run: |
+          python -m venv "${{ runner.temp }}/tracecheck-wheel"
+          "${{ runner.temp }}/tracecheck-wheel/bin/python" -m pip install dist/*.whl
+          "${{ runner.temp }}/tracecheck-wheel/bin/genai-tracecheck" --version

@@ -22,6 +22,12 @@ from genai_tracecheck.models import (
     TraceCompleteness,
 )
 
+EXIT_STATUS_HELP = """exit status:
+  0  every analyzed input passed the configured quality gate
+  1  at least one analyzed input failed the gate or could not be loaded in a batch
+  2  command usage, input resolution, configuration, or report writing was invalid
+"""
+
 
 def _add_common_check_options(command: argparse.ArgumentParser) -> None:
     command.add_argument(
@@ -61,16 +67,31 @@ def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="genai-tracecheck",
         description="Check OpenTelemetry GenAI traces for quality and privacy risks.",
+        epilog=EXIT_STATUS_HELP,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    check = subparsers.add_parser("check", help="analyze an OTLP JSON trace export")
+    check = subparsers.add_parser(
+        "check",
+        help="analyze an OTLP JSON trace export",
+        description="Analyze one canonical OTLP/HTTP JSON trace export.",
+        epilog=EXIT_STATUS_HELP,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     check.add_argument("input", type=Path, help="path to an OTLP JSON file")
     _add_common_check_options(check)
 
     batch = subparsers.add_parser(
-        "batch", help="analyze files, directories, or glob patterns as one batch"
+        "batch",
+        help="analyze files, directories, or glob patterns as one batch",
+        description=(
+            "Analyze one deterministic batch. Directories are recursive; quote glob patterns "
+            "so TraceCheck expands them consistently."
+        ),
+        epilog=EXIT_STATUS_HELP,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     batch.add_argument(
         "inputs",
@@ -106,6 +127,14 @@ def _atomic_write(path: Path, content: str, *, force: bool) -> None:
         raise
 
 
+def _reject_input_output_alias(output: Path | None, inputs: Sequence[Path]) -> None:
+    if output is None:
+        return
+    canonical_output = output.expanduser().resolve()
+    if any(canonical_output == path.expanduser().resolve() for path in inputs):
+        raise InputResolutionError(f"output path is also an input: {output}")
+
+
 def _policy_from_args(args: argparse.Namespace) -> Policy:
     policy = load_policy_config(args.config) if args.config is not None else Policy()
     updates: dict[str, object] = {}
@@ -126,22 +155,24 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         policy = _policy_from_args(args)
         if args.command == "check":
+            _reject_input_output_alias(args.output, [args.input])
             spans = load_otlp_json(args.input)
             report = analyze_spans(spans, source=str(args.input), policy=policy)
         else:
             paths = resolve_input_paths(args.inputs)
-            if args.output is not None:
-                output_path = args.output.expanduser().resolve()
-                if output_path in paths:
-                    raise InputResolutionError("output path is also an input")
+            _reject_input_output_alias(args.output, paths)
             report = analyze_batch(paths, policy=policy)
 
         document = json.dumps(report.model_dump(mode="json"), indent=2, ensure_ascii=False) + "\n"
         if args.output:
             _atomic_write(args.output, document, force=args.force)
-            file_count = f"{report.summary.files} file(s); " if args.command == "batch" else ""
+            batch_counts = (
+                f"{report.summary.files} file(s), {report.summary.load_errors} load error(s), "
+                if args.command == "batch"
+                else ""
+            )
             print(
-                f"{'PASS' if report.passed else 'FAIL'}: {file_count}"
+                f"{'PASS' if report.passed else 'FAIL'}: {batch_counts}"
                 f"{report.summary.errors} error(s), "
                 f"{report.summary.warnings} warning(s); report: {args.output}",
                 file=sys.stderr,

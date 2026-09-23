@@ -62,11 +62,15 @@ distinguishes quality/load failures from invalid command usage.
 affect findings and the quality gate consistently, active settings appear in reports, and explicit
 CLI policy flags override file values without discarding unrelated settings.
 
-### Day 7 — release candidate review
+### Day 7 — release candidate review (completed)
 
 - Run mutation-oriented edge cases and coverage analysis.
 - Improve error messages and CLI help.
 - Tag `v0.2.0` if all acceptance tests pass.
+
+**Definition of done:** lint and 105 tests pass, combined statement/branch coverage reaches 98% and
+is enforced at 95%, distributions build and install cleanly, CLI safety/ergonomics are reviewed,
+and the passing `main` commit is tagged `v0.2.0`.
 
 ## Week 2 — evidence and open-source value
 

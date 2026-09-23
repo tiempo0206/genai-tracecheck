@@ -67,6 +67,7 @@ severity = "error"
             'schema_version = "1.0"\n[rules.GTC005]\nenabled = false\nseverity = "error"',
             "disabled rule",
         ),
+        ('schema_version = "1.0"\n[rules.GTC005]\n', "must set enabled or severity"),
         ('schema_version = "1.0"\n[rules.GTC005', "invalid TOML"),
     ],
 )
@@ -164,3 +165,10 @@ def test_programmatic_policy_rejects_unknown_and_conflicting_rule_settings() -> 
             disabled_rules=frozenset({"GTC005"}),
             severity_overrides={"GTC005": Severity.ERROR},
         )
+    with pytest.raises(ValueError, match="GTC999"):
+        Policy(severity_overrides={"GTC999": Severity.ERROR})
+
+
+def test_missing_configuration_file_is_reported(tmp_path: Path) -> None:
+    with pytest.raises(ConfigurationError, match="cannot read configuration"):
+        load_policy_config(tmp_path / "missing.toml")

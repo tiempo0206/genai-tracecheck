@@ -184,10 +184,10 @@ and project releases will record the standards snapshot they target.
 
 ## Project status
 
-Version `0.1.0` is a tested vertical slice: canonical OTLP JSON in, deterministic single-file or
+Version `0.2.0` is a tested vertical slice: canonical OTLP JSON in, deterministic single-file or
 batch reports out, with reusable policy configuration and auditable CI behavior. The two-week plan
-continues with release-candidate review, framework-generated fixtures, SARIF output, benchmarks, and
-an upstream-ready research note. See
+continues with framework-generated fixtures, SARIF output, benchmarks, and an upstream-ready
+research note. See
 [`docs/roadmap.md`](docs/roadmap.md) and [`docs/project-log.md`](docs/project-log.md).
 
 ## Development
