@@ -1,0 +1,15 @@
+schema_version = "1.0"
+
+[policy]
+fail_on = "error"
+content_policy = "review"
+detect_secret_values = true
+trace_completeness = "partial"
+
+# Optional semantic metadata can be disabled for environments that cannot provide it.
+[rules.GTC102]
+enabled = false
+
+# Promote parent/child timing containment from a warning to an error.
+[rules.GTC005]
+severity = "error"

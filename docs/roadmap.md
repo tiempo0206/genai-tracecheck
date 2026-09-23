@@ -52,11 +52,15 @@ subset relationships are checked conservatively, and numeric boundary behavior i
 one bad file does not discard other results, batch reports preserve per-file identity, and the CLI
 distinguishes quality/load failures from invalid command usage.
 
-### Day 6 — configuration contract
+### Day 6 — configuration contract (completed)
 
 - Add a versioned TOML policy file.
 - Support rule enable/disable and severity overrides.
 - Validate unknown keys strictly and document precedence.
+
+**Definition of done:** an explicit version `1.0` TOML file is strictly validated, rule controls
+affect findings and the quality gate consistently, active settings appear in reports, and explicit
+CLI policy flags override file values without discarding unrelated settings.
 
 ### Day 7 — release candidate review
 

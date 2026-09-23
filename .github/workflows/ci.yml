@@ -37,6 +37,8 @@ jobs:
             --output reports/latency-tokens.json
           genai-tracecheck batch examples/valid.otlp.json examples/latency-tokens.otlp.json \
             --output reports/batch-valid.json
+          genai-tracecheck check examples/valid.otlp.json --config examples/policy.toml \
+            --output reports/configured-valid.json
           if genai-tracecheck check examples/risky.otlp.json; then
             echo "Expected risky fixture to fail"
             exit 1
@@ -60,5 +62,10 @@ jobs:
           fi
           if genai-tracecheck batch examples/valid.otlp.json examples/risky.otlp.json; then
             echo "Expected a batch containing the risky fixture to fail"
+            exit 1
+          fi
+          if genai-tracecheck check examples/structured-content.otlp.json \
+            --config examples/policy.toml --fail-on warning; then
+            echo "Expected explicit warning threshold to override configuration"
             exit 1
           fi

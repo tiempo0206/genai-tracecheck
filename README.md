@@ -55,7 +55,15 @@ genai-tracecheck check trace.json --content-policy allow --no-secret-detection
 
 # Require every non-root span to have its parent in this export.
 genai-tracecheck check trace.json --trace-completeness complete
+
+# Reuse a reviewed policy across local runs and CI.
+genai-tracecheck check trace.json --config examples/policy.toml
 ```
+
+TOML configuration can set the same policy controls, disable individual rules, and override rule
+severity. Precedence is deterministic: built-in defaults, then the configuration file, then policy
+flags explicitly supplied on the command line. Configuration is never discovered implicitly. See
+[`docs/configuration.md`](docs/configuration.md) for the version `1.0` contract.
 
 ## Rule set
 
@@ -95,7 +103,11 @@ Output is a versioned JSON document with a summary and stable, sortable findings
   "schema_version": "1.0",
   "passed": false,
   "fail_on": "error",
+  "content_policy": "review",
+  "detect_secret_values": true,
   "trace_completeness": "partial",
+  "disabled_rules": [],
+  "severity_overrides": {},
   "summary": {
     "spans": 1,
     "genai_spans": 1,
@@ -173,8 +185,9 @@ and project releases will record the standards snapshot they target.
 ## Project status
 
 Version `0.1.0` is a tested vertical slice: canonical OTLP JSON in, deterministic single-file or
-batch reports out, with configurable CI behavior. The two-week plan continues with versioned policy
-configuration, framework-generated fixtures, SARIF output, benchmarks, and an upstream-ready research note. See
+batch reports out, with reusable policy configuration and auditable CI behavior. The two-week plan
+continues with release-candidate review, framework-generated fixtures, SARIF output, benchmarks, and
+an upstream-ready research note. See
 [`docs/roadmap.md`](docs/roadmap.md) and [`docs/project-log.md`](docs/project-log.md).
 
 ## Development

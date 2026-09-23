@@ -13,6 +13,7 @@ from pathlib import Path
 from genai_tracecheck import __version__
 from genai_tracecheck.analysis import analyze_spans
 from genai_tracecheck.batch import InputResolutionError, analyze_batch, resolve_input_paths
+from genai_tracecheck.config import ConfigurationError, load_policy_config
 from genai_tracecheck.loader import TraceLoadError, load_otlp_json
 from genai_tracecheck.models import (
     ContentPolicy,
@@ -23,30 +24,36 @@ from genai_tracecheck.models import (
 
 
 def _add_common_check_options(command: argparse.ArgumentParser) -> None:
+    command.add_argument(
+        "--config",
+        type=Path,
+        help="load a versioned TOML policy file (CLI policy flags take precedence)",
+    )
     command.add_argument("--output", "-o", type=Path, help="write the JSON report to this file")
     command.add_argument("--force", action="store_true", help="replace an existing report")
     command.add_argument(
         "--fail-on",
         choices=[item.value for item in FailureThreshold],
-        default=FailureThreshold.ERROR.value,
-        help="minimum severity that makes the command fail (default: error)",
+        default=None,
+        help="minimum severity that makes the command fail (built-in: error)",
     )
     command.add_argument(
         "--content-policy",
         choices=[item.value for item in ContentPolicy],
-        default=ContentPolicy.REVIEW.value,
-        help="allow, review, or forbid captured prompt/output content (default: review)",
+        default=None,
+        help="allow, review, or forbid captured prompt/output content (built-in: review)",
     )
     command.add_argument(
-        "--no-secret-detection",
-        action="store_true",
-        help="disable heuristic secret-pattern detection",
+        "--secret-detection",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="enable or disable heuristic secret-pattern detection (built-in: enabled)",
     )
     command.add_argument(
         "--trace-completeness",
         choices=[item.value for item in TraceCompleteness],
-        default=TraceCompleteness.PARTIAL.value,
-        help="treat input as a partial or complete trace export (default: partial)",
+        default=None,
+        help="treat input as a partial or complete trace export (built-in: partial)",
     )
 
 
@@ -100,12 +107,17 @@ def _atomic_write(path: Path, content: str, *, force: bool) -> None:
 
 
 def _policy_from_args(args: argparse.Namespace) -> Policy:
-    return Policy(
-        fail_on=FailureThreshold(args.fail_on),
-        content_policy=ContentPolicy(args.content_policy),
-        detect_secret_values=not args.no_secret_detection,
-        trace_completeness=TraceCompleteness(args.trace_completeness),
-    )
+    policy = load_policy_config(args.config) if args.config is not None else Policy()
+    updates: dict[str, object] = {}
+    if args.fail_on is not None:
+        updates["fail_on"] = FailureThreshold(args.fail_on)
+    if args.content_policy is not None:
+        updates["content_policy"] = ContentPolicy(args.content_policy)
+    if args.secret_detection is not None:
+        updates["detect_secret_values"] = args.secret_detection
+    if args.trace_completeness is not None:
+        updates["trace_completeness"] = TraceCompleteness(args.trace_completeness)
+    return policy.model_copy(update=updates)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -136,7 +148,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
         else:
             print(document, end="")
-    except (InputResolutionError, TraceLoadError, FileExistsError, OSError, ValueError) as exc:
+    except (
+        ConfigurationError,
+        InputResolutionError,
+        TraceLoadError,
+        FileExistsError,
+        OSError,
+        ValueError,
+    ) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
 

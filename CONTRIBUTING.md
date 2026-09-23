@@ -22,7 +22,8 @@ pytest
 3. Add the smallest synthetic OTLP fixture that proves the issue.
 4. Test positive, negative, and boundary cases without including real prompts or credentials.
 5. Ensure findings never echo sensitive values.
-6. Update the rule table and project log.
+6. Add the rule ID to `rule_catalog.py` so configuration can validate it.
+7. Update the rule table and project log.
 
 Attributes that only appear in an open proposal must not be enforced as accepted convention. Label
 experimental behavior and document false-positive risks.
