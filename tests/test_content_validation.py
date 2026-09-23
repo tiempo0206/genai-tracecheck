@@ -108,3 +108,73 @@ def test_rejects_wrong_root_type() -> None:
 def test_rejects_unsupported_attribute_name() -> None:
     with pytest.raises(ValueError, match="unsupported content attribute"):
         validate_content_attribute("gen_ai.unknown", [])
+
+
+@pytest.mark.parametrize(
+    ("part", "expected_paths"),
+    [
+        (7, {"$[0].parts[0]"}),
+        ({}, {"$[0].parts[0].type"}),
+        (
+            {"type": "server_tool_call", "id": 7, "name": 9},
+            {
+                "$[0].parts[0].id",
+                "$[0].parts[0].name",
+                "$[0].parts[0].server_tool_call",
+            },
+        ),
+        (
+            {
+                "type": "server_tool_call_response",
+                "server_tool_call_response": {},
+            },
+            {"$[0].parts[0].server_tool_call_response.type"},
+        ),
+        (
+            {"type": "blob", "modality": 1, "content": 2, "mime_type": 3},
+            {
+                "$[0].parts[0].modality",
+                "$[0].parts[0].content",
+                "$[0].parts[0].mime_type",
+            },
+        ),
+        (
+            {"type": "file", "modality": 1, "file_id": 2, "mime_type": 3},
+            {
+                "$[0].parts[0].modality",
+                "$[0].parts[0].file_id",
+                "$[0].parts[0].mime_type",
+            },
+        ),
+        (
+            {"type": "compaction", "id": 1, "content": 2},
+            {"$[0].parts[0].id", "$[0].parts[0].content"},
+        ),
+    ],
+)
+def test_known_part_mutations_are_rejected(part: object, expected_paths: set[str]) -> None:
+    value = [{"role": "user", "parts": [part]}]
+
+    result = validate_content_attribute(INPUT_MESSAGES, value)
+
+    assert {issue.path for issue in result.issues} == expected_paths
+
+
+def test_rejects_non_object_messages_and_instruction_parts() -> None:
+    messages = validate_content_attribute(OUTPUT_MESSAGES, [7])
+    instructions = validate_content_attribute(SYSTEM_INSTRUCTIONS, [7, {"type": "text"}])
+
+    assert {issue.path for issue in messages.issues} == {"$[0]"}
+    assert {issue.path for issue in instructions.issues} == {"$[0]", "$[1].content"}
+
+
+def test_rejects_wrong_finish_reason_type_without_copying_value() -> None:
+    result = validate_content_attribute(
+        OUTPUT_MESSAGES,
+        [{"role": "assistant", "parts": [], "finish_reason": 7}],
+    )
+
+    assert {(issue.path, issue.constraint) for issue in result.issues} == {
+        ("$[0].finish_reason", "must be a string or null")
+    }
+    assert result.deprecated_paths == ("$[0].finish_reason",)

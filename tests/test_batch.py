@@ -32,6 +32,22 @@ def test_resolve_inputs_rejects_an_unmatched_argument(tmp_path: Path) -> None:
         resolve_input_paths([tmp_path / "missing"])
 
 
+def test_resolve_inputs_rejects_an_empty_argument_list() -> None:
+    with pytest.raises(InputResolutionError, match="at least one batch input"):
+        resolve_input_paths([])
+
+
+def test_glob_that_matches_a_directory_discovers_its_json_files(tmp_path: Path) -> None:
+    nested = tmp_path / "matched-directory"
+    nested.mkdir()
+    trace = nested / "trace.json"
+    trace.write_text("{}", encoding="utf-8")
+
+    paths = resolve_input_paths([str(tmp_path / "matched-*")])
+
+    assert paths == [trace.resolve()]
+
+
 def test_analyze_batch_rejects_an_empty_file_sequence() -> None:
     with pytest.raises(InputResolutionError, match="at least one resolved file"):
         analyze_batch([])
@@ -138,3 +154,13 @@ def test_batch_cli_returns_one_for_a_load_error_and_keeps_valid_results(
     assert output["summary"]["analyzed_files"] == 1
     assert output["summary"]["load_errors"] == 1
     assert {item["status"] for item in output["files"]} == {"analyzed", "load_error"}
+
+
+def test_batch_output_status_mentions_load_errors(tmp_path: Path, capsys) -> None:
+    (tmp_path / "broken.json").write_text("not json", encoding="utf-8")
+    output_path = tmp_path.parent / f"{tmp_path.name}-report.json"
+
+    exit_code = main(["batch", str(tmp_path), "--output", str(output_path)])
+
+    assert exit_code == 1
+    assert "1 load error(s)" in capsys.readouterr().err

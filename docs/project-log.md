@@ -321,3 +321,56 @@ mistakes fail visibly instead of silently weakening the quality gate.
 
 Perform Day 7 release-candidate review: exercise mutation-oriented edge cases, measure coverage,
 improve CLI/error ergonomics, and decide whether the evidence supports a `v0.2.0` tag.
+
+## 2026-09-23 — Day 7: release-candidate review
+
+### Objective
+
+Audit the first-week feature set as a release candidate, use coverage and mutation-oriented
+reasoning to expose weak tests, improve command-line safety, and release only against measured gates.
+
+### Baseline finding
+
+The original 73-test suite passed but combined statement/branch coverage was 90%. Most missed paths
+were malformed OTLP nesting, less-common official content parts, and CLI write failures. Passing
+tests alone therefore did not provide enough release evidence.
+
+### Completed
+
+- Added Coverage.py branch measurement with a 95% CI minimum.
+- Added mutation-oriented cases for known content parts, nested OTLP boundaries, configuration
+  contradictions, batch all-files semantics, atomic cleanup, and CLI policy precedence.
+- Expanded the suite from 73 to 105 tests and raised measured coverage from 90% to 98%.
+- Fixed single-file `--force` output aliasing so an input cannot be overwritten by its own report.
+- Improved batch status text to show file-load failures separately from rule errors and warnings.
+- Added exit-code guidance and deterministic-glob guidance to CLI help.
+- Added distribution builds and clean wheel-install smoke tests to both supported Python CI jobs.
+- Bumped the package and runtime version to `0.2.0`.
+- Added a release-candidate review, changelog, and explicit verification table.
+
+### Engineering decisions
+
+1. **Measure branches, not only lines.** Boolean decisions define quality-gate behavior; line-only
+   coverage would overstate confidence in them.
+2. **Use a meaningful floor.** The 95% aggregate gate leaves room for defensive OS race paths while
+   preventing a substantial untested feature from entering unnoticed.
+3. **Document mutation hypotheses honestly.** The tests target plausible logic mutations, but the
+   project does not claim a mutation score without running a dedicated tool.
+4. **Protect source data in every mode.** `--force` authorizes replacement of a report, never an
+   input trace that happens to share the output path.
+5. **Tag the merged commit.** The release tag is created only after the review PR passes both Python
+   CI jobs and is merged to `main`.
+
+### Verification result
+
+- Ruff lint and format checks: passed.
+- Pytest: 105 passed.
+- Combined statement/branch coverage: 98% (minimum: 95%).
+- Positive, quality-failing, load-failing, and invalid-configuration CLI paths: passed.
+- Source distribution and wheel build: passed.
+- Clean wheel installation and `genai-tracecheck --version`: passed.
+
+### Next task
+
+Begin Day 8 with framework-generated fixtures from two instrumentation libraries, sanitize them,
+and document semantic differences without treating optional attributes as defects.
