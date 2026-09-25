@@ -85,11 +85,16 @@ without provider network access, normalized fixtures are content-addressed and r
 pass the default quality gate, and observed differences are documented as evidence rather than
 project rankings.
 
-### Day 9 — compatibility matrix
+### Day 9 — compatibility matrix (completed)
 
 - Run every fixture through the same rules.
 - Produce a machine-readable compatibility matrix.
 - Separate exporter defects from optional/experimental attributes.
+
+**Definition of done:** all ten fixtures are analyzed with one policy, every expected gate is
+verified, a versioned JSON matrix records fixture digests and the pinned standards revision, and
+framework observations distinguish required violations from recommended/opt-in absence,
+deprecations, local policy, and deliberate negative tests.
 
 ### Day 10 — SARIF output
 
