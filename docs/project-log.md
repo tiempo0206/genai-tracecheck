@@ -374,3 +374,63 @@ tests alone therefore did not provide enough release evidence.
 
 Begin Day 8 with framework-generated fixtures from two instrumentation libraries, sanitize them,
 and document semantic differences without treating optional attributes as defects.
+
+## 2026-09-23 — Day 8: framework-generated fixtures
+
+### Objective
+
+Replace hand-authored-only evidence with reproducible OTLP traces emitted by two real GenAI
+instrumentation packages, while keeping the experiment offline, sanitized, and fair to each source.
+
+### Upstream research
+
+- Selected the OpenTelemetry Python GenAI OpenAI and LangChain instrumentations from the same
+  upstream project and pinned both at `1.1b0`.
+- Followed the upstream OpenAI test strategy of using an `httpx.MockTransport` so the official SDK
+  request path executes without contacting a provider.
+- Followed the upstream LangChain tests in using `FakeMessagesListChatModel` for an in-process model
+  response.
+- Confirmed that message-content capture is opt-in and enabled it only for invented fixture text.
+
+### Completed
+
+- Added a standalone generator environment with exact direct dependency pins.
+- Generated one OpenAI SDK trace and one LangChain fake-model trace through real instrumentation.
+- Exported the finished SDK spans as canonical OTLP/HTTP JSON.
+- Replaced runtime IDs, timestamps, and resource metadata with deterministic synthetic values while
+  preserving instrumentation-produced GenAI attributes.
+- Added a versioned manifest with scenario provenance, installed versions, normalization steps, and
+  SHA-256 fixture digests.
+- Added regression tests for digest integrity, dependency pins, default-gate results, semantic
+  differences, deterministic timestamps, and credential absence.
+- Documented reproduction, sanitization, trust boundaries, and a neutral comparison of emitted
+  attributes.
+- Added a CI batch exercise covering both framework-generated fixtures.
+
+### Engineering decisions
+
+1. **Generate offline, not approximately.** The real SDK/instrumentation call paths run against a
+   mock transport or fake model; no hand-authored JSON is presented as framework output.
+2. **Keep framework dependencies isolated.** TraceCheck remains a small framework-neutral runtime;
+   the pinned generator environment is installed only when deliberately regenerating fixtures.
+3. **Freeze provenance and bytes together.** The manifest records exact versions and file digests so
+   a dependency update cannot silently change the evidence.
+4. **Normalize nondeterminism, preserve semantics.** Runtime IDs, times, and incidental resource
+   fields are replaced, but span names and `gen_ai.*` values are retained for comparison.
+5. **Absence is evidence, not a verdict.** Token totals and response metadata can depend on what a
+   model backend exposes; the documentation reports their presence without ranking projects.
+
+### Verification result
+
+- Fixture regeneration check: byte-for-byte reproducible.
+- Ruff lint and format checks: passed.
+- Pytest: 110 passed.
+- Combined statement/branch coverage remained above the enforced 95% minimum.
+- Both individual fixtures passed with zero errors and two expected warnings (`GTC106`, `GTC201`).
+- The two-file batch passed with 2 spans, 2 GenAI spans, 0 errors, and 4 warnings.
+- Credential-marker and SHA-256 integrity checks: passed.
+
+### Next task
+
+Implement Day 9's machine-readable compatibility matrix across synthetic and framework-generated
+fixtures, separating required failures from optional, experimental, or unavailable attributes.

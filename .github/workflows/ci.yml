@@ -37,6 +37,8 @@ jobs:
             --output reports/latency-tokens.json
           genai-tracecheck batch examples/valid.otlp.json examples/latency-tokens.otlp.json \
             --output reports/batch-valid.json
+          genai-tracecheck batch 'examples/framework/*.otlp.json' \
+            --output reports/framework-fixtures.json
           genai-tracecheck check examples/valid.otlp.json --config examples/policy.toml \
             --output reports/configured-valid.json
           if genai-tracecheck check examples/risky.otlp.json; then

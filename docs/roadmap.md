@@ -74,11 +74,16 @@ and the passing `main` commit is tagged `v0.2.0`.
 
 ## Week 2 — evidence and open-source value
 
-### Day 8 — framework-generated fixtures
+### Day 8 — framework-generated fixtures (completed)
 
 - Generate comparable traces from two instrumentation libraries.
 - Sanitize and freeze minimal reproducible fixtures.
 - Document semantic differences without ranking projects unfairly.
+
+**Definition of done:** two pinned official instrumentation packages generate comparable traces
+without provider network access, normalized fixtures are content-addressed and reproducible, both
+pass the default quality gate, and observed differences are documented as evidence rather than
+project rankings.
 
 ### Day 9 — compatibility matrix
 

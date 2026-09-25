@@ -29,10 +29,16 @@ rewriting quality rules.
 11. `batch.py` preserves independent file results and derives aggregate batch counts.
 12. `cli.py` prints JSON or writes it atomically, then returns a machine-friendly exit code.
 
+The core package remains framework-neutral. A separate development-only pipeline under
+`tools/framework-fixtures/` invokes real instrumentation against local mock/fake backends, exports
+SDK spans to canonical OTLP JSON, normalizes nondeterministic identifiers and timestamps, and freezes
+content-addressed fixtures. It never runs inside the analyzer.
+
 ## Trust boundaries
 
 - Input trace files are untrusted. Invalid structure produces a controlled load error.
 - The analyzer never performs network requests.
+- Framework fixture generation uses only a local HTTP mock transport or an in-process fake model.
 - A secret-shaped match is never copied into a finding.
 - A schema finding contains only its attribute, JSON path, and violated constraint.
 - Existing report files are not replaced unless `--force` is explicit.
@@ -56,7 +62,7 @@ than an error because asynchronous work can legitimately outlive the initiating 
 - **Readers:** OTLP protobuf, JSON Lines, and collector endpoints.
 - **Rules:** response-stream timing, provider-specific invariants, and richer graph policies.
 - **Outputs:** SARIF for code scanning and HTML for portfolio demonstrations.
-- **Adapters:** reproducible fixtures emitted by multiple GenAI instrumentation libraries.
+- **Adapters:** more reproducible fixtures emitted by GenAI instrumentation libraries.
 
 ## Deliberate first-release limits
 
