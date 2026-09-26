@@ -10,7 +10,7 @@ import tempfile
 from collections.abc import Sequence
 from pathlib import Path
 
-from genai_tracecheck import __version__
+from genai_tracecheck._version import __version__
 from genai_tracecheck.analysis import analyze_spans
 from genai_tracecheck.batch import InputResolutionError, analyze_batch, resolve_input_paths
 from genai_tracecheck.config import ConfigurationError, load_policy_config
@@ -21,6 +21,7 @@ from genai_tracecheck.models import (
     Policy,
     TraceCompleteness,
 )
+from genai_tracecheck.sarif import report_to_sarif
 
 EXIT_STATUS_HELP = """exit status:
   0  every analyzed input passed the configured quality gate
@@ -35,8 +36,14 @@ def _add_common_check_options(command: argparse.ArgumentParser) -> None:
         type=Path,
         help="load a versioned TOML policy file (CLI policy flags take precedence)",
     )
-    command.add_argument("--output", "-o", type=Path, help="write the JSON report to this file")
+    command.add_argument("--output", "-o", type=Path, help="write the report to this file")
     command.add_argument("--force", action="store_true", help="replace an existing report")
+    command.add_argument(
+        "--format",
+        choices=("json", "sarif"),
+        default="json",
+        help="report format (default: json)",
+    )
     command.add_argument(
         "--fail-on",
         choices=[item.value for item in FailureThreshold],
@@ -163,7 +170,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             _reject_input_output_alias(args.output, paths)
             report = analyze_batch(paths, policy=policy)
 
-        document = json.dumps(report.model_dump(mode="json"), indent=2, ensure_ascii=False) + "\n"
+        output = (
+            report_to_sarif(report) if args.format == "sarif" else report.model_dump(mode="json")
+        )
+        document = json.dumps(output, indent=2, ensure_ascii=False) + "\n"
         if args.output:
             _atomic_write(args.output, document, force=args.force)
             batch_counts = (
