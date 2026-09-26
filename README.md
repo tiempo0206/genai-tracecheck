@@ -63,6 +63,12 @@ privacy policy, and intentional negative tests. See
 SARIF 2.1.0 output provides stable fingerprints and repository-relative locations without copying
 captured trace content or identifiers. See [`docs/sarif.md`](docs/sarif.md).
 
+The reproducible performance harness generates fixed-seed 1K, 10K, and 100K fixtures, measures load,
+analysis, and end-to-end throughput plus peak Python allocations, and retains a 100K cumulative
+profile. The committed arm64 run processed 100K spans end to end in a 1.678-second median (59.6K
+spans/s); treat that as one-machine evidence, not a universal guarantee. See
+[`docs/performance.md`](docs/performance.md).
+
 Useful policy controls:
 
 ```bash
@@ -208,8 +214,9 @@ and project releases will record the standards snapshot they target.
 
 Version `0.2.0` is a tested vertical slice: canonical OTLP JSON in, deterministic single-file or
 batch reports out, with reusable policy configuration and auditable CI behavior. Framework-generated
-fixtures now cover OpenAI and LangChain instrumentation; the two-week plan continues with a
-performance benchmark and an upstream-ready research note. See
+fixtures now cover OpenAI and LangChain instrumentation, and the benchmark characterizes the pipeline
+through 100K spans with one profile-backed optimization. The two-week plan continues with contributor
+experience and an upstream-ready research note. See
 [`docs/roadmap.md`](docs/roadmap.md) and [`docs/project-log.md`](docs/project-log.md).
 
 ## Development

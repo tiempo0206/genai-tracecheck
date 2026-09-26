@@ -1,0 +1,31 @@
+         22926119 function calls in 4.711 seconds
+
+   Ordered by: cumulative time
+   List reduced from 106 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.033    0.033    4.711    4.711 run.py:146(_end_to_end)
+        1    0.000    0.000    2.710    2.710 run.py:142(_analyze)
+        1    0.017    0.017    2.710    2.710 analysis.py:48(analyze_spans)
+   100000    0.064    0.000    2.023    0.000 rules.py:330(evaluate_span)
+        1    0.039    0.039    1.968    1.968 run.py:138(_load)
+        1    0.185    0.185    1.929    1.929 loader.py:73(load_otlp_json)
+   300001    0.061    0.000    1.799    0.000 {method 'extend' of 'list' objects}
+   100000    0.313    0.000    1.668    0.000 rules.py:216(semantic_findings)
+   100000    0.297    0.000    1.157    0.000 rules.py:177(_token_consistency_findings)
+   101003    0.787    0.000    0.886    0.000 main.py:253(__init__)
+  1800000    0.386    0.000    0.638    0.000 rules.py:133(_valid_token)
+   100001    0.214    0.000    0.420    0.000 loader.py:48(_decode_attributes)
+        1    0.000    0.000    0.319    0.319 __init__.py:299(loads)
+        1    0.000    0.000    0.319    0.319 decoder.py:340(decode)
+        1    0.319    0.319    0.319    0.319 decoder.py:351(raw_decode)
+        1    0.011    0.011    0.314    0.314 metrics.py:90(summarize_traces)
+  4699009    0.305    0.000    0.305    0.000 {method 'get' of 'dict' objects}
+     1000    0.046    0.000    0.298    0.000 metrics.py:33(_summarize_trace)
+  6800017    0.272    0.000    0.272    0.000 {built-in method builtins.isinstance}
+        1    0.015    0.015    0.267    0.267 graph_rules.py:165(evaluate_trace_graph)
+   506001    0.056    0.000    0.253    0.000 {built-in method builtins.sum}
+     1000    0.091    0.000    0.247    0.000 graph_rules.py:102(_trace_findings)
+   204006    0.073    0.000    0.214    0.000 {built-in method builtins.sorted}
+   300000    0.059    0.000    0.178    0.000 classification.py:9(is_genai_span)
+   400001    0.049    0.000    0.167    0.000 {built-in method builtins.any}
