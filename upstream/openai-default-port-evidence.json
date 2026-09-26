@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "researched_at": "2026-09-26",
+  "publication_status": "draft_only_owner_review_required",
+  "upstream": {
+    "repository": "open-telemetry/opentelemetry-python-genai",
+    "revision": "14c76fee1a5270d194bfada07f711352a2d3aa4d",
+    "openai_instrumentation_version": "1.2b0"
+  },
+  "semantic_conventions": {
+    "repository": "open-telemetry/semantic-conventions-genai",
+    "revision": "e57c543b4889619eb2a05702471937db5119165d",
+    "requirement": "server.port is conditionally required if server.address is set"
+  },
+  "local_fixture": {
+    "path": "examples/framework/openai-chat.otlp.json",
+    "instrumentation_version": "1.1b0",
+    "sha256": "a7975404962e7aa0b06c5b28bb91c64773fb10062bb37a04452ea65530daa00f",
+    "transport": "httpx MockTransport",
+    "base_url_scheme": "https",
+    "implicit_port": 443,
+    "observed_attributes": {
+      "server.address": true,
+      "server.port": false
+    }
+  },
+  "source_evidence": {
+    "path": "instrumentation/opentelemetry-instrumentation-genai-openai/src/opentelemetry/instrumentation/genai/openai/utils.py",
+    "function": "get_server_address_and_port",
+    "behavior": "The current implementation converts port 443 to None before returning it.",
+    "test_path": "instrumentation/opentelemetry-instrumentation-genai-openai/tests/test_utils.py",
+    "test_behavior": "The current test only asserts server.port for positive non-443 ports."
+  },
+  "issue_searches": [
+    {
+      "query": "is:issue \"server.port\" OpenAI",
+      "url": "https://github.com/open-telemetry/opentelemetry-python-genai/issues?q=is%3Aissue+%22server.port%22+OpenAI",
+      "result": "no_matching_issue_found"
+    },
+    {
+      "query": "is:issue OpenAI default port 443",
+      "url": "https://github.com/open-telemetry/opentelemetry-python-genai/issues?q=is%3Aissue+OpenAI+default+port+443",
+      "result": "no_matching_issue_found"
+    }
+  ]
+}

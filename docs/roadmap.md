@@ -128,13 +128,18 @@ evidence; the PR template and rule-author guide cover provenance, privacy, tests
 contracts; the typed top-level API is documented and regression-tested; and CI installs both wheel
 and sdist into fresh environments before exercising imports, dependency integrity, and the CLI.
 
-### Day 13 — upstream contribution preparation
+### Day 13 — upstream contribution preparation (completed)
 
 - Search upstream issues and contribution guidelines again.
 - Draft a small evidence-backed issue or documentation patch.
 - Ask maintainers before proposing a broad semantic change.
 
 Opening an upstream issue or pull request requires owner review; it is not an automated project step.
+
+**Definition of done:** current contribution guidance and duplicate reports are re-checked against
+the migrated upstream repository; the local fixture, current implementation, current tests, and
+pinned convention are linked in a machine-readable evidence snapshot; a narrowly scoped human-review
+draft and post-confirmation patch plan are prepared; and nothing is posted on the owner's behalf.
 
 ### Day 14 — portfolio release
 
