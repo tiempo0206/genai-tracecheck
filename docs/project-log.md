@@ -434,3 +434,68 @@ instrumentation packages, while keeping the experiment offline, sanitized, and f
 
 Implement Day 9's machine-readable compatibility matrix across synthetic and framework-generated
 fixtures, separating required failures from optional, experimental, or unavailable attributes.
+
+## 2026-09-25 — Day 9: compatibility matrix
+
+### Objective
+
+Run every committed OTLP fixture through one policy and produce durable evidence that separates
+actual required violations from missing-but-optional telemetry, evolving conventions, local policy,
+and deliberate negative tests.
+
+### Upstream research
+
+- Pinned the matrix to OpenTelemetry GenAI semantic-convention revision `e57c543` rather than a
+  moving documentation URL.
+- Confirmed that inference spans remain at `development` stability in that revision.
+- Confirmed `gen_ai.operation.name` and `gen_ai.provider.name` are required for inference clients.
+- Recorded request model as conditionally required when available; response metadata, usage totals,
+  finish reasons, and server address as recommended; and captured messages as opt-in.
+- Reviewed the upstream Python GenAI project's conformance guidance so this project does not present
+  its smaller fixture matrix as a replacement for Weaver live-check.
+
+### Completed
+
+- Added a deterministic generator that discovers and analyzes all ten OTLP fixtures with the same
+  default TraceCheck policy.
+- Added explicit fixture purposes, positive/negative/framework categories, and expected quality-gate
+  outcomes.
+- Added SHA-256 digests for every fixture and fail-fast catalog coverage for additions or removals.
+- Added a version `1.0` machine-readable matrix with aggregate results, per-fixture rule evidence,
+  framework package versions, and attribute-presence status.
+- Added a classification contract for candidate required violations, deprecations, recommended and
+  opt-in absence, local policy, and intentional negative cases.
+- Excluded captured content, matched secrets, trace IDs, and span IDs from the matrix.
+- Added documentation, README/architecture/roadmap updates, tests, and a CI regeneration check.
+
+### Engineering decisions
+
+1. **One policy for every fixture.** Separate per-source settings would make comparisons convenient
+   but not comparable.
+2. **Declare test intent.** Failures in a negative regression fixture are success evidence for the
+   analyzer, not exporter defects.
+3. **Treat recommended absence conservatively.** A missing value is not a defect without proof that
+   the provider or framework exposed it to the instrumentation.
+4. **Use a candidate threshold for exporter claims.** Only required/structural failures in a real
+   framework fixture enter `exporter_defect_candidates`, and still require upstream reproduction.
+5. **Snapshot evolving standards.** The matrix stores an exact upstream revision and `development`
+   stability instead of implying a timeless compatibility result.
+6. **Keep evidence content-free.** Presence and rule metadata answer the compatibility question
+   without creating another copy of captured prompts or responses.
+
+### Verification result
+
+- Matrix regeneration check: byte-for-byte reproducible.
+- Fixture coverage and SHA-256 integrity: 10 of 10 verified.
+- Expected quality gates: 10 of 10 matched.
+- Aggregate analysis: 20 spans, 10 traces, 16 deliberate errors, and 12 warnings.
+- Framework-generated fixtures: both passed the TraceCheck gate; one conditional `server.port`
+  absence was isolated as an exporter defect candidate pending upstream reproduction.
+- Ruff lint and format checks: passed.
+- Pytest: 115 passed.
+- Combined statement/branch coverage remained above the enforced 95% minimum.
+
+### Next task
+
+Implement Day 10 SARIF output with content-free locations, stable fingerprints, severity mapping,
+tests, and a demonstration GitHub code-scanning workflow.

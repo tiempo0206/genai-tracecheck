@@ -26,6 +26,8 @@ jobs:
         run: ruff check . && ruff format --check .
       - name: Test
         run: coverage run -m pytest && coverage report
+      - name: Check compatibility matrix
+        run: python tools/compatibility-matrix/generate.py --check
       - name: Exercise the CLI
         run: |
           genai-tracecheck check examples/valid.otlp.json --output reports/valid.json

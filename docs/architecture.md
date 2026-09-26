@@ -34,6 +34,11 @@ The core package remains framework-neutral. A separate development-only pipeline
 SDK spans to canonical OTLP JSON, normalizes nondeterministic identifiers and timestamps, and freezes
 content-addressed fixtures. It never runs inside the analyzer.
 
+`tools/compatibility-matrix/` then discovers every frozen OTLP fixture, analyzes the complete set
+with one default policy, joins framework provenance, and writes a content-free compatibility
+snapshot. Fixture purpose and expected gate are explicit, so a new fixture cannot silently disappear
+from the evidence set.
+
 ## Trust boundaries
 
 - Input trace files are untrusted. Invalid structure produces a controlled load error.
@@ -46,6 +51,7 @@ content-addressed fixtures. It never runs inside the analyzer.
 - Directory discovery ignores hidden entries and does not follow symlinked directories.
 - Configuration is explicit, versioned, and rejects unknown fields or rule IDs.
 - Policy rules are labeled separately from upstream semantic-convention checks.
+- Compatibility output contains presence metadata and rule IDs, never captured content values.
 
 ## Partial versus complete trace exports
 

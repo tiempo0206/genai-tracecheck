@@ -51,6 +51,11 @@ genai-tracecheck batch 'examples/framework/*.otlp.json'
 The generator, exact dependency versions, sanitization steps, and observed semantic differences are
 documented in [`docs/framework-fixtures.md`](docs/framework-fixtures.md).
 
+All ten committed fixtures are also summarized in a versioned, machine-readable compatibility
+matrix. It separates required violations from recommended or opt-in absences, deprecations, local
+privacy policy, and intentional negative tests. See
+[`docs/compatibility-matrix.md`](docs/compatibility-matrix.md).
+
 Useful policy controls:
 
 ```bash
@@ -197,7 +202,7 @@ and project releases will record the standards snapshot they target.
 Version `0.2.0` is a tested vertical slice: canonical OTLP JSON in, deterministic single-file or
 batch reports out, with reusable policy configuration and auditable CI behavior. Framework-generated
 fixtures now cover OpenAI and LangChain instrumentation; the two-week plan continues with a
-compatibility matrix, SARIF output, benchmarks, and an upstream-ready research note. See
+SARIF output, benchmarks, and an upstream-ready research note. See
 [`docs/roadmap.md`](docs/roadmap.md) and [`docs/project-log.md`](docs/project-log.md).
 
 ## Development

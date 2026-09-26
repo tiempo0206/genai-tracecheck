@@ -1,0 +1,623 @@
+{
+  "schema_version": "1.0",
+  "snapshot_date": "2026-09-25",
+  "standards_baseline": {
+    "name": "OpenTelemetry GenAI semantic conventions",
+    "source_revision": "e57c543b4889619eb2a05702471937db5119165d",
+    "source_url": "https://github.com/open-telemetry/semantic-conventions-genai/blob/e57c543b4889619eb2a05702471937db5119165d/model/gen-ai/spans.yaml",
+    "span_stability": "development",
+    "scope": "gen_ai.inference.client attribute requirement levels"
+  },
+  "analysis_policy": {
+    "fail_on": "error",
+    "content_policy": "review",
+    "detect_secret_values": true,
+    "trace_completeness": "partial",
+    "disabled_rules": [],
+    "severity_overrides": {}
+  },
+  "classification_contract": {
+    "candidate_required_violation": "A framework fixture violated a required/structural invariant; reproduce upstream before calling it an exporter defect.",
+    "deprecated_shape": "A deprecated semantic shape was observed; this is migration evidence, not a required-field failure.",
+    "recommended_not_observed": "A recommended attribute was absent; absence is not a defect without evidence that the source exposed the value.",
+    "missing_conditionally_required": "A conditionally required attribute was absent while its stated condition was observed; record it as an exporter defect candidate pending upstream reproduction.",
+    "opt_in_not_observed": "An opt-in content signal was absent; this may be a privacy configuration choice.",
+    "local_policy": "A TraceCheck privacy/policy finding, not an exporter conformance claim.",
+    "intentional_negative_case": "A synthetic fixture deliberately triggered the rule and is expected to fail."
+  },
+  "summary": {
+    "files": 10,
+    "analyzed_files": 10,
+    "load_errors": 0,
+    "passed_files": 6,
+    "failed_files": 4,
+    "spans": 20,
+    "genai_spans": 10,
+    "traces": 10,
+    "errors": 16,
+    "warnings": 12,
+    "expected_gate_matches": 10,
+    "framework_fixtures": 2,
+    "frameworks_with_required_violations": 1,
+    "exporter_defect_candidates": 1
+  },
+  "exporter_defect_candidates": [
+    {
+      "source": "openai",
+      "items": [
+        "server.port"
+      ]
+    }
+  ],
+  "fixtures": [
+    {
+      "path": "examples/framework/langchain-chat.otlp.json",
+      "kind": "framework_generated",
+      "expected_gate": "pass",
+      "purpose": "Observe LangChain instrumentation output from an in-process fake model.",
+      "sha256": "1d7e1a1621162ce9b6ec570e03843126b137d0987363e1793dfb310ee4756edf",
+      "actual_gate": "pass",
+      "expectation_match": true,
+      "summary": {
+        "spans": 1,
+        "genai_spans": 1,
+        "errors": 0,
+        "warnings": 2
+      },
+      "rule_ids": [
+        "GTC106",
+        "GTC201"
+      ],
+      "finding_dispositions": {
+        "deprecated_shape": 1,
+        "local_policy": 1
+      },
+      "findings": [
+        {
+          "rule_id": "GTC106",
+          "severity": "warning",
+          "origin": "otel_genai_semantics",
+          "disposition": "deprecated_shape"
+        },
+        {
+          "rule_id": "GTC201",
+          "severity": "warning",
+          "origin": "tracecheck_local_policy",
+          "disposition": "local_policy"
+        }
+      ]
+    },
+    {
+      "path": "examples/framework/openai-chat.otlp.json",
+      "kind": "framework_generated",
+      "expected_gate": "pass",
+      "purpose": "Observe OpenAI instrumentation output from an HTTP mock response.",
+      "sha256": "a7975404962e7aa0b06c5b28bb91c64773fb10062bb37a04452ea65530daa00f",
+      "actual_gate": "pass",
+      "expectation_match": true,
+      "summary": {
+        "spans": 1,
+        "genai_spans": 1,
+        "errors": 0,
+        "warnings": 2
+      },
+      "rule_ids": [
+        "GTC106",
+        "GTC201"
+      ],
+      "finding_dispositions": {
+        "deprecated_shape": 1,
+        "local_policy": 1
+      },
+      "findings": [
+        {
+          "rule_id": "GTC106",
+          "severity": "warning",
+          "origin": "otel_genai_semantics",
+          "disposition": "deprecated_shape"
+        },
+        {
+          "rule_id": "GTC201",
+          "severity": "warning",
+          "origin": "tracecheck_local_policy",
+          "disposition": "local_policy"
+        }
+      ]
+    },
+    {
+      "path": "examples/graph-issues.otlp.json",
+      "kind": "synthetic_negative",
+      "expected_gate": "fail",
+      "purpose": "Exercise duplicate span, cycle, and parent containment findings.",
+      "sha256": "258c1a8d20aecfef4001d20ebf757ef57f865db731b945d5b63a7b22590436ba",
+      "actual_gate": "fail",
+      "expectation_match": true,
+      "summary": {
+        "spans": 7,
+        "genai_spans": 0,
+        "errors": 2,
+        "warnings": 1
+      },
+      "rule_ids": [
+        "GTC003",
+        "GTC004",
+        "GTC005"
+      ],
+      "finding_dispositions": {
+        "intentional_negative_case": 3
+      },
+      "findings": [
+        {
+          "rule_id": "GTC003",
+          "severity": "error",
+          "origin": "otel_structure",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC004",
+          "severity": "error",
+          "origin": "otel_structure",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC005",
+          "severity": "warning",
+          "origin": "otel_structure",
+          "disposition": "intentional_negative_case"
+        }
+      ]
+    },
+    {
+      "path": "examples/inconsistent-usage.otlp.json",
+      "kind": "synthetic_negative",
+      "expected_gate": "fail",
+      "purpose": "Exercise latency, token subset, and tool-token findings.",
+      "sha256": "87ef70bc6766d11fd446fe0e2d9aaaf328a45cfb0191257e4e8650487ed9d41c",
+      "actual_gate": "fail",
+      "expectation_match": true,
+      "summary": {
+        "spans": 3,
+        "genai_spans": 2,
+        "errors": 3,
+        "warnings": 1
+      },
+      "rule_ids": [
+        "GTC107",
+        "GTC108",
+        "GTC109"
+      ],
+      "finding_dispositions": {
+        "intentional_negative_case": 4
+      },
+      "findings": [
+        {
+          "rule_id": "GTC107",
+          "severity": "error",
+          "origin": "otel_genai_semantics",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC108",
+          "severity": "error",
+          "origin": "otel_genai_semantics",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC108",
+          "severity": "error",
+          "origin": "otel_genai_semantics",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC109",
+          "severity": "warning",
+          "origin": "otel_genai_semantics",
+          "disposition": "intentional_negative_case"
+        }
+      ]
+    },
+    {
+      "path": "examples/latency-tokens.otlp.json",
+      "kind": "synthetic_positive",
+      "expected_gate": "pass",
+      "purpose": "Verify valid latency and token aggregation.",
+      "sha256": "66ce8370bfdfd1153fec972e1c74a3039a72a869f2101454799f1df191e15aee",
+      "actual_gate": "pass",
+      "expectation_match": true,
+      "summary": {
+        "spans": 3,
+        "genai_spans": 2,
+        "errors": 0,
+        "warnings": 0
+      },
+      "rule_ids": [],
+      "finding_dispositions": {},
+      "findings": []
+    },
+    {
+      "path": "examples/malformed-content.otlp.json",
+      "kind": "synthetic_negative",
+      "expected_gate": "fail",
+      "purpose": "Exercise structured content schema findings.",
+      "sha256": "a9aee9b096ab09b5c2e1ef559f793d25e1bee8aebc9f3894a796e82b46ff1251",
+      "actual_gate": "fail",
+      "expectation_match": true,
+      "summary": {
+        "spans": 1,
+        "genai_spans": 1,
+        "errors": 6,
+        "warnings": 2
+      },
+      "rule_ids": [
+        "GTC105",
+        "GTC106",
+        "GTC201"
+      ],
+      "finding_dispositions": {
+        "intentional_negative_case": 8
+      },
+      "findings": [
+        {
+          "rule_id": "GTC105",
+          "severity": "error",
+          "origin": "otel_genai_semantics",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC105",
+          "severity": "error",
+          "origin": "otel_genai_semantics",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC105",
+          "severity": "error",
+          "origin": "otel_genai_semantics",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC105",
+          "severity": "error",
+          "origin": "otel_genai_semantics",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC105",
+          "severity": "error",
+          "origin": "otel_genai_semantics",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC105",
+          "severity": "error",
+          "origin": "otel_genai_semantics",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC106",
+          "severity": "warning",
+          "origin": "otel_genai_semantics",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC201",
+          "severity": "warning",
+          "origin": "tracecheck_local_policy",
+          "disposition": "intentional_negative_case"
+        }
+      ]
+    },
+    {
+      "path": "examples/partial-trace.otlp.json",
+      "kind": "synthetic_positive",
+      "expected_gate": "pass",
+      "purpose": "Verify the default partial-export parent policy.",
+      "sha256": "48ce11c4572125dd6b3585d524c7abad8e5ea07c3ea4600efc2113e6b31f388e",
+      "actual_gate": "pass",
+      "expectation_match": true,
+      "summary": {
+        "spans": 1,
+        "genai_spans": 0,
+        "errors": 0,
+        "warnings": 0
+      },
+      "rule_ids": [],
+      "finding_dispositions": {},
+      "findings": []
+    },
+    {
+      "path": "examples/risky.otlp.json",
+      "kind": "synthetic_negative",
+      "expected_gate": "fail",
+      "purpose": "Exercise structural, semantic, privacy, and secret findings.",
+      "sha256": "3f1d256cdf6fe6615c882cb05955581e204c7d1c5a47fa8504e25a4e208f833b",
+      "actual_gate": "fail",
+      "expectation_match": true,
+      "summary": {
+        "spans": 1,
+        "genai_spans": 1,
+        "errors": 5,
+        "warnings": 3
+      },
+      "rule_ids": [
+        "GTC002",
+        "GTC101",
+        "GTC102",
+        "GTC103",
+        "GTC104",
+        "GTC105",
+        "GTC201",
+        "GTC202"
+      ],
+      "finding_dispositions": {
+        "intentional_negative_case": 8
+      },
+      "findings": [
+        {
+          "rule_id": "GTC002",
+          "severity": "error",
+          "origin": "otel_structure",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC101",
+          "severity": "error",
+          "origin": "otel_genai_semantics",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC104",
+          "severity": "error",
+          "origin": "otel_genai_semantics",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC105",
+          "severity": "error",
+          "origin": "otel_genai_semantics",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC202",
+          "severity": "error",
+          "origin": "tracecheck_local_policy",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC102",
+          "severity": "warning",
+          "origin": "otel_genai_semantics",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC103",
+          "severity": "warning",
+          "origin": "otel_genai_semantics",
+          "disposition": "intentional_negative_case"
+        },
+        {
+          "rule_id": "GTC201",
+          "severity": "warning",
+          "origin": "tracecheck_local_policy",
+          "disposition": "intentional_negative_case"
+        }
+      ]
+    },
+    {
+      "path": "examples/structured-content.otlp.json",
+      "kind": "synthetic_positive",
+      "expected_gate": "pass",
+      "purpose": "Verify valid opt-in structured content with privacy review.",
+      "sha256": "ea72758ebe768f8dbbbeb91d53b3f5680e85310d0613b9f15dea06b9ebca2e42",
+      "actual_gate": "pass",
+      "expectation_match": true,
+      "summary": {
+        "spans": 1,
+        "genai_spans": 1,
+        "errors": 0,
+        "warnings": 1
+      },
+      "rule_ids": [
+        "GTC201"
+      ],
+      "finding_dispositions": {
+        "local_policy": 1
+      },
+      "findings": [
+        {
+          "rule_id": "GTC201",
+          "severity": "warning",
+          "origin": "tracecheck_local_policy",
+          "disposition": "local_policy"
+        }
+      ]
+    },
+    {
+      "path": "examples/valid.otlp.json",
+      "kind": "synthetic_positive",
+      "expected_gate": "pass",
+      "purpose": "Provide the minimal conforming reference trace.",
+      "sha256": "c2f80d5866af53323f8ae9094f29ce40035372c988e1656eb9b2a90a2c8183fe",
+      "actual_gate": "pass",
+      "expectation_match": true,
+      "summary": {
+        "spans": 1,
+        "genai_spans": 1,
+        "errors": 0,
+        "warnings": 0
+      },
+      "rule_ids": [],
+      "finding_dispositions": {},
+      "findings": []
+    }
+  ],
+  "frameworks": [
+    {
+      "source": "langchain",
+      "fixture": "examples/framework/langchain-chat.otlp.json",
+      "instrumentation_package": "opentelemetry-instrumentation-genai-langchain",
+      "instrumentation_version": "1.1b0",
+      "signals": [
+        {
+          "attribute": "gen_ai.operation.name",
+          "requirement_level": "required",
+          "status": "present"
+        },
+        {
+          "attribute": "gen_ai.provider.name",
+          "requirement_level": "required",
+          "status": "present"
+        },
+        {
+          "attribute": "gen_ai.request.model",
+          "requirement_level": "conditionally_required_if_available",
+          "status": "present"
+        },
+        {
+          "attribute": "gen_ai.response.id",
+          "requirement_level": "recommended",
+          "status": "recommended_not_observed"
+        },
+        {
+          "attribute": "gen_ai.response.model",
+          "requirement_level": "recommended",
+          "status": "recommended_not_observed"
+        },
+        {
+          "attribute": "gen_ai.response.finish_reasons",
+          "requirement_level": "recommended",
+          "status": "recommended_not_observed"
+        },
+        {
+          "attribute": "gen_ai.usage.input_tokens",
+          "requirement_level": "recommended",
+          "status": "recommended_not_observed"
+        },
+        {
+          "attribute": "gen_ai.usage.output_tokens",
+          "requirement_level": "recommended",
+          "status": "recommended_not_observed"
+        },
+        {
+          "attribute": "server.address",
+          "requirement_level": "recommended",
+          "status": "recommended_not_observed"
+        },
+        {
+          "attribute": "server.port",
+          "requirement_level": "conditionally_required_if_server_address",
+          "status": "not_applicable"
+        },
+        {
+          "attribute": "gen_ai.input.messages",
+          "requirement_level": "opt_in",
+          "status": "present"
+        },
+        {
+          "attribute": "gen_ai.output.messages",
+          "requirement_level": "opt_in",
+          "status": "present"
+        }
+      ],
+      "required_attributes_missing": [],
+      "recommended_attributes_not_observed": [
+        "gen_ai.response.id",
+        "gen_ai.response.model",
+        "gen_ai.response.finish_reasons",
+        "gen_ai.usage.input_tokens",
+        "gen_ai.usage.output_tokens",
+        "server.address"
+      ],
+      "deprecated_shape_findings": [
+        "GTC106"
+      ],
+      "local_policy_findings": [
+        "GTC201"
+      ],
+      "exporter_defect_candidates": [],
+      "assessment": "no_required_violation_observed"
+    },
+    {
+      "source": "openai",
+      "fixture": "examples/framework/openai-chat.otlp.json",
+      "instrumentation_package": "opentelemetry-instrumentation-genai-openai",
+      "instrumentation_version": "1.1b0",
+      "signals": [
+        {
+          "attribute": "gen_ai.operation.name",
+          "requirement_level": "required",
+          "status": "present"
+        },
+        {
+          "attribute": "gen_ai.provider.name",
+          "requirement_level": "required",
+          "status": "present"
+        },
+        {
+          "attribute": "gen_ai.request.model",
+          "requirement_level": "conditionally_required_if_available",
+          "status": "present"
+        },
+        {
+          "attribute": "gen_ai.response.id",
+          "requirement_level": "recommended",
+          "status": "present"
+        },
+        {
+          "attribute": "gen_ai.response.model",
+          "requirement_level": "recommended",
+          "status": "present"
+        },
+        {
+          "attribute": "gen_ai.response.finish_reasons",
+          "requirement_level": "recommended",
+          "status": "present"
+        },
+        {
+          "attribute": "gen_ai.usage.input_tokens",
+          "requirement_level": "recommended",
+          "status": "present"
+        },
+        {
+          "attribute": "gen_ai.usage.output_tokens",
+          "requirement_level": "recommended",
+          "status": "present"
+        },
+        {
+          "attribute": "server.address",
+          "requirement_level": "recommended",
+          "status": "present"
+        },
+        {
+          "attribute": "server.port",
+          "requirement_level": "conditionally_required_if_server_address",
+          "status": "missing_conditionally_required"
+        },
+        {
+          "attribute": "gen_ai.input.messages",
+          "requirement_level": "opt_in",
+          "status": "present"
+        },
+        {
+          "attribute": "gen_ai.output.messages",
+          "requirement_level": "opt_in",
+          "status": "present"
+        }
+      ],
+      "required_attributes_missing": [
+        "server.port"
+      ],
+      "recommended_attributes_not_observed": [],
+      "deprecated_shape_findings": [
+        "GTC106"
+      ],
+      "local_policy_findings": [
+        "GTC201"
+      ],
+      "exporter_defect_candidates": [
+        "server.port"
+      ],
+      "assessment": "candidate_required_violation"
+    }
+  ]
+}
