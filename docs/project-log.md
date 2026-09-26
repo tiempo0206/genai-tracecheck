@@ -499,3 +499,72 @@ and deliberate negative tests.
 
 Implement Day 10 SARIF output with content-free locations, stable fingerprints, severity mapping,
 tests, and a demonstration GitHub code-scanning workflow.
+
+## 2026-09-26 — Day 10: content-safe SARIF output
+
+### Objective
+
+Expose TraceCheck findings to standard code-scanning infrastructure without changing quality-gate
+behavior or turning the SARIF artifact into another copy of sensitive telemetry.
+
+### Standards and platform research
+
+- Confirmed GitHub Code Scanning supports the SARIF `2.1.0` subset.
+- Confirmed each displayed result needs a location and that repository-relative paths give the most
+  reliable annotations.
+- Confirmed GitHub uses `partialFingerprints.primaryLocationLineHash` to match alerts across runs.
+- Confirmed third-party upload workflows require `security-events: write`.
+- Used the OASIS SARIF 2.1.0 specification for top-level, rule, result, artifact-location, region,
+  and partial-fingerprint structure.
+
+### Completed
+
+- Added `--format json|sarif` to both `check` and `batch`, preserving JSON as the default.
+- Added a SARIF 2.1.0 converter with all 17 rules, deterministic indexes, descriptions, help links,
+  and default severity metadata.
+- Mapped effective post-configuration severities to SARIF `error` and `warning` levels.
+- Added repository-relative artifact paths and span-scoped line/column locations with a safe line-1
+  fallback.
+- Added deterministic SHA-256 fingerprints under GitHub's primary key and a versioned TraceCheck
+  key.
+- Restricted fingerprint inputs to identifiers that are hashed plus an explicit allowlist of safe
+  structural detail.
+- Excluded raw trace/span IDs, captured content, secret matches, and unreviewed finding details from
+  output.
+- Added batch source preservation and run metadata for report type, gate status, and load errors.
+- Added a least-privilege GitHub Code Scanning demonstration workflow using `upload-sarif@v4`.
+- Added CLI/CI exercises, a SARIF contract document, architecture/README/roadmap updates, and nine
+  focused regression tests.
+
+### Engineering decisions
+
+1. **Serialization does not alter evaluation.** JSON and SARIF share one analyzed report and return
+   the same exit status.
+2. **Point to the span, not captured content.** A span-level source location is useful in fixture
+   review and avoids parsing sensitive nested values into annotations.
+3. **Hash identity, emit no identity.** Trace and span IDs help distinguish telemetry events but
+   appear only inside the fingerprint preimage.
+4. **Allowlist fingerprint detail.** New rule details cannot silently leak into SARIF; only reviewed
+   structural keys participate.
+5. **Honor effective severity.** Configuration overrides must affect JSON counts, SARIF levels, and
+   the quality gate consistently.
+6. **Do not invent load-error rules.** Batch load failures remain run metadata and exit-code evidence.
+7. **Keep the upload explicitly demonstrative.** Alerts target the deliberately risky fixture and
+   are not presented as application vulnerabilities.
+
+### Verification result
+
+- Ruff lint and format checks: passed.
+- Pytest: 124 passed.
+- Combined statement/branch coverage remained above the enforced 95% minimum.
+- Risky fixture: 8 SARIF results with valid rule indexes, levels, locations, and fingerprints.
+- Generated output validated against the official OASIS SARIF 2.1.0 JSON Schema.
+- Repeated conversion: byte-identical fingerprints.
+- Known secret, captured message, raw trace ID, and raw span ID leakage checks: passed.
+- Single, batch, stdout, file output, and severity-override paths: passed.
+- Distribution build and installed CLI smoke test: passed.
+
+### Next task
+
+Implement Day 11's reproducible 1K/10K/100K span benchmark, recording seed, throughput, peak memory,
+and profiler-backed optimization decisions.

@@ -27,7 +27,9 @@ rewriting quality rules.
 10. `analysis.py` applies rule configuration, then sorts and counts findings before evaluating the
     selected CI threshold.
 11. `batch.py` preserves independent file results and derives aggregate batch counts.
-12. `cli.py` prints JSON or writes it atomically, then returns a machine-friendly exit code.
+12. `sarif.py` maps safe finding metadata to SARIF 2.1.0 locations, rules, severity, and stable
+    fingerprints without copying trace identity or captured values.
+13. `cli.py` prints JSON/SARIF or writes it atomically, then returns a machine-friendly exit code.
 
 The core package remains framework-neutral. A separate development-only pipeline under
 `tools/framework-fixtures/` invokes real instrumentation against local mock/fake backends, exports
@@ -52,6 +54,7 @@ from the evidence set.
 - Configuration is explicit, versioned, and rejects unknown fields or rule IDs.
 - Policy rules are labeled separately from upstream semantic-convention checks.
 - Compatibility output contains presence metadata and rule IDs, never captured content values.
+- SARIF fingerprints hash trace identity and safe structural details; raw identifiers are omitted.
 
 ## Partial versus complete trace exports
 
@@ -67,7 +70,7 @@ than an error because asynchronous work can legitimately outlive the initiating 
 
 - **Readers:** OTLP protobuf, JSON Lines, and collector endpoints.
 - **Rules:** response-stream timing, provider-specific invariants, and richer graph policies.
-- **Outputs:** SARIF for code scanning and HTML for portfolio demonstrations.
+- **Outputs:** HTML for portfolio demonstrations and additional CI annotations.
 - **Adapters:** more reproducible fixtures emitted by GenAI instrumentation libraries.
 
 ## Deliberate first-release limits

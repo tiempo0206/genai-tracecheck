@@ -1,23 +1,23 @@
-"""Stable catalog of rule identifiers accepted by configuration files."""
+"""Stable rule metadata shared by configuration and report formats."""
 
-SUPPORTED_RULE_IDS = frozenset(
-    {
-        "GTC001",
-        "GTC002",
-        "GTC003",
-        "GTC004",
-        "GTC005",
-        "GTC006",
-        "GTC101",
-        "GTC102",
-        "GTC103",
-        "GTC104",
-        "GTC105",
-        "GTC106",
-        "GTC107",
-        "GTC108",
-        "GTC109",
-        "GTC201",
-        "GTC202",
-    }
-)
+RULE_METADATA = {
+    "GTC001": ("Valid OTLP identifiers", "error"),
+    "GTC002": ("Valid span timestamps", "error"),
+    "GTC003": ("Unique span IDs within a trace", "error"),
+    "GTC004": ("Acyclic parent relationships", "error"),
+    "GTC005": ("Child lifetime contained by parent", "warning"),
+    "GTC006": ("Complete exports contain referenced parents", "error"),
+    "GTC101": ("GenAI operation name present", "error"),
+    "GTC102": ("GenAI provider present when available", "warning"),
+    "GTC103": ("GenAI request or response model present when available", "warning"),
+    "GTC104": ("Non-negative integer token usage", "error"),
+    "GTC105": ("Valid structured GenAI content", "error"),
+    "GTC106": ("No deprecated output-message finish reason", "warning"),
+    "GTC107": ("Valid time to first chunk", "error"),
+    "GTC108": ("Token breakdown does not exceed aggregate", "error"),
+    "GTC109": ("Tool spans do not report token usage", "warning"),
+    "GTC201": ("Captured GenAI content follows local privacy policy", "warning"),
+    "GTC202": ("No secret-shaped values in captured GenAI content", "error"),
+}
+
+SUPPORTED_RULE_IDS = frozenset(RULE_METADATA)

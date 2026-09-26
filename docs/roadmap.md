@@ -96,11 +96,15 @@ verified, a versioned JSON matrix records fixture digests and the pinned standar
 framework observations distinguish required violations from recommended/opt-in absence,
 deprecations, local policy, and deliberate negative tests.
 
-### Day 10 — SARIF output
+### Day 10 — SARIF output (completed)
 
 - Map findings to SARIF without leaking trace content.
 - Upload SARIF in a demonstration workflow.
 - Test locations, severities, and stable fingerprints.
+
+**Definition of done:** single and batch reports emit SARIF 2.1.0 without changing gate semantics,
+every result has a repository-relative location and deterministic fingerprint, tests prove severity
+overrides and content non-disclosure, and a least-privilege workflow demonstrates GitHub upload.
 
 ### Day 11 — performance benchmark
 

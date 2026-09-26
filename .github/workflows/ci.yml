@@ -43,8 +43,15 @@ jobs:
             --output reports/framework-fixtures.json
           genai-tracecheck check examples/valid.otlp.json --config examples/policy.toml \
             --output reports/configured-valid.json
+          genai-tracecheck check examples/valid.otlp.json --format sarif \
+            --output reports/valid.sarif
           if genai-tracecheck check examples/risky.otlp.json; then
             echo "Expected risky fixture to fail"
+            exit 1
+          fi
+          if genai-tracecheck check examples/risky.otlp.json --format sarif \
+            --output reports/risky.sarif; then
+            echo "Expected risky SARIF fixture to fail"
             exit 1
           fi
           if genai-tracecheck check examples/malformed-content.otlp.json; then

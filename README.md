@@ -36,6 +36,10 @@ genai-tracecheck check examples/risky.otlp.json --output reports/risky.json
 # Recursively analyze a directory and a quoted glob as one deterministic batch.
 genai-tracecheck batch traces/current 'traces/archive/**/*.json' \
   --output reports/batch.json
+
+# Emit content-safe SARIF for code scanning integrations.
+genai-tracecheck check examples/risky.otlp.json \
+  --format sarif --output reports/risky.sarif
 ```
 
 The command returns exit code `0` when the configured quality gate passes, `1` when findings reach
@@ -55,6 +59,9 @@ All ten committed fixtures are also summarized in a versioned, machine-readable 
 matrix. It separates required violations from recommended or opt-in absences, deprecations, local
 privacy policy, and intentional negative tests. See
 [`docs/compatibility-matrix.md`](docs/compatibility-matrix.md).
+
+SARIF 2.1.0 output provides stable fingerprints and repository-relative locations without copying
+captured trace content or identifiers. See [`docs/sarif.md`](docs/sarif.md).
 
 Useful policy controls:
 
@@ -202,7 +209,7 @@ and project releases will record the standards snapshot they target.
 Version `0.2.0` is a tested vertical slice: canonical OTLP JSON in, deterministic single-file or
 batch reports out, with reusable policy configuration and auditable CI behavior. Framework-generated
 fixtures now cover OpenAI and LangChain instrumentation; the two-week plan continues with a
-SARIF output, benchmarks, and an upstream-ready research note. See
+performance benchmark and an upstream-ready research note. See
 [`docs/roadmap.md`](docs/roadmap.md) and [`docs/project-log.md`](docs/project-log.md).
 
 ## Development
