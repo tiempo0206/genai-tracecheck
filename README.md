@@ -231,8 +231,9 @@ Version `0.2.0` is a tested vertical slice: canonical OTLP JSON in, deterministi
 batch reports out, with reusable policy configuration and auditable CI behavior. Framework-generated
 fixtures now cover OpenAI and LangChain instrumentation, and the benchmark characterizes the pipeline
 through 100K spans with one profile-backed optimization. Structured issue forms, a rule-authoring
-guide, typed public API, and clean wheel/sdist tests support outside contributors. The two-week plan
-continues with an upstream-ready research note. See
+guide, typed public API, and clean wheel/sdist tests support outside contributors. An upstream-ready
+research note now reduces one compatibility observation to pinned evidence and a human-review draft
+without posting on the owner's behalf. The two-week plan continues with the portfolio release. See
 [`docs/roadmap.md`](docs/roadmap.md) and [`docs/project-log.md`](docs/project-log.md).
 
 ## Development

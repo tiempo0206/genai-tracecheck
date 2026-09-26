@@ -68,9 +68,13 @@ evidence about an external exporter.
 Neither framework fixture has a TraceCheck semantic error, and both contain the required operation
 and provider attributes. The pinned standards revision also says `server.port` is conditionally
 required when `server.address` is set. The OpenAI fixture has the address but not the port, so the
-matrix records one `server.port` exporter-defect candidate. It is not called a confirmed defect:
-the convention is at `development` stability, the snapshot postdates instrumentation `1.1b0`, and
-the mock URL uses the implicit HTTPS port. This needs upstream reproduction before an issue is filed.
+matrix records one `server.port` exporter-defect candidate. Day 13 confirmed that current upstream
+source at `14c76fe` deliberately maps port 443 to `None`, while the pinned convention still
+describes the port as conditionally required without a default-port exception. This remains a
+clarification candidate rather than a confirmed defect because the convention is at `development`
+stability and other protocol conventions sometimes omit default ports. See the
+[`upstream contribution draft`](upstream-contribution-draft.md) for pinned evidence and the required
+human-review boundary.
 
 LangChain's fake model does not expose the same provider response metadata as the mocked OpenAI
 response, so its six recommended absences are recorded as `recommended_not_observed`, not exporter

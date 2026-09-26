@@ -705,3 +705,68 @@ Python API, and prove that both distribution formats work outside the source che
 Prepare Day 13's upstream contribution research: re-check current upstream contribution guidance and
 issues, reduce the compatibility observation to a small evidence-backed proposal, and draft it for
 owner review without publishing externally.
+
+## 2026-09-26 — Day 13: upstream contribution preparation
+
+### Objective
+
+Turn one compatibility-matrix observation into a narrow, reproducible upstream contribution
+candidate while respecting the upstream project's contribution policy and avoiding an unsupported
+claim that the behavior is already a confirmed defect.
+
+### Upstream research
+
+- Confirmed that the maintained GenAI packages moved from `opentelemetry-python-contrib` to
+  `open-telemetry/opentelemetry-python-genai`.
+- Pinned the inspected Python GenAI source to `14c76fee1a5270d194bfada07f711352a2d3aa4d`, where
+  the OpenAI instrumentation reports version `1.2b0`.
+- Reused the compatibility matrix's pinned semantic-convention revision
+  `e57c543b4889619eb2a05702471937db5119165d`.
+- Re-checked the new repository's contribution guidance, bug form, and two focused issue searches;
+  no matching default-HTTPS-port issue was found on the research date.
+- Recorded the upstream rule that AI-generated issue and pull-request comments must not be posted.
+
+### Completed
+
+- Added a versioned machine-readable evidence snapshot with repository revisions, the frozen fixture
+  digest, observed attributes, source/test behavior, duplicate-search links, and publication status.
+- Connected four independent evidence layers: the local `1.1b0` fixture, current `1.2b0` source,
+  current upstream tests, and the pinned GenAI semantic-convention model.
+- Documented that upstream deliberately converts port 443 to `None` while the current GenAI span
+  model makes `server.port` conditional on `server.address` without stating a default-port exception.
+- Classified the result as a specification/implementation clarification candidate, not a confirmed
+  instrumentation defect.
+- Prepared a concise bug-form draft, maintainer question, minimal post-confirmation patch plan, and
+  owner checklist without publishing any external comment or issue.
+- Added regression tests that bind the evidence to the real frozen fixture and protect the human
+  review boundary.
+- Updated the compatibility narrative, roadmap, and project status to point to the research artifact.
+
+### Engineering decisions
+
+1. **Ask before changing semantics.** The current evidence proves a mismatch candidate but does not
+   decide whether instrumentation or a development-stage convention should change.
+2. **Pin every moving source.** Commit revisions and the fixture digest make the claim inspectable
+   after upstream main and issue results change.
+3. **Test research artifacts.** A prose note alone could drift away from the fixture; tests now check
+   both the digest and the actual attribute presence.
+4. **Keep public authorship human.** The repository contains preparation and evidence only. The owner
+   must reproduce, search again, rewrite in their own words, and choose the discussion channel.
+5. **Target the migrated repository.** Preparing work against the former contrib location would make
+   an otherwise correct proposal operationally obsolete.
+
+### Verification result
+
+- Ruff lint and formatting checks: passed.
+- Pytest: 134 passed.
+- Combined statement/branch coverage: 98% (minimum: 95%).
+- Compatibility matrix regeneration check: passed.
+- Wheel and source distribution build: passed.
+- Evidence digest and fixture observation test: passed.
+- External publication: none; status remains `draft_only_owner_review_required`.
+
+### Next task
+
+Complete Day 14's portfolio release: audit the final acceptance criteria, close any remaining rule
+count gap, publish durable architecture/demo evidence, prepare measured resume bullets, and tag
+`v1.0.0` only after the merged release commit and CI are green.
