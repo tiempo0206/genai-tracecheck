@@ -635,3 +635,73 @@ specific avoidable cost.
 
 Implement Day 12 contributor experience: issue templates, a rule-author checklist, clearer public
 API/docstrings, and another clean-environment installation test.
+
+## 2026-09-26 — Day 12: contributor experience
+
+### Objective
+
+Make the repository safe and understandable for an outside contributor: route reports into useful
+structured evidence, define the complete rule-development contract, expose an intentional typed
+Python API, and prove that both distribution formats work outside the source checkout.
+
+### Platform and packaging research
+
+- Followed GitHub's Issue Forms structure and template-chooser configuration, including unique field
+  IDs, required validations, and `blank_issues_enabled: false`.
+- Followed the Python Packaging User Guide recommendation to build both a wheel and source
+  distribution and install artifacts into isolated virtual environments.
+- Treated the installed package—not an editable source tree—as the authoritative clean-install
+  target, and used Python isolated mode for the import probe.
+
+### Completed
+
+- Added separate Issue Forms for sanitized bug reports and evidence-backed rule proposals.
+- Added privacy notices that prohibit real prompts, credentials, personal data, and proprietary
+  trace content in reproductions.
+- Added a pull-request template covering evidence, tests, privacy, documentation, distribution
+  changes, and rule-specific synchronization.
+- Rewrote the contributor guide around issue routing, coverage, evidence classification, public API
+  changes, complete local checks, and pull-request expectations.
+- Added a rule-authoring guide covering family selection, applicability, severity, safe diagnostics,
+  implementation layers, independent tests, configuration, SARIF, and public contract updates.
+- Expanded the top-level API with `ContentPolicy`, `FailureThreshold`, `Finding`, and `Severity`.
+- Added useful docstrings to loader, discovery, configuration, single/batch analysis, and SARIF
+  operations, plus programmatic single, batch, policy, and SARIF examples.
+- Declared inline typing with `py.typed` and configured package data so both artifacts retain it.
+- Added a cross-platform clean-install tool that creates one fresh environment per artifact, runs
+  `pip check`, imports the public API with `python -I`, verifies installation outside the checkout,
+  checks `py.typed`, and exercises the installed CLI on an invented one-span fixture.
+- Replaced the former wheel-version-only CI smoke with wheel and sdist end-to-end smoke tests on both
+  supported Python versions.
+
+### Engineering decisions
+
+1. **Ask for evidence at issue creation.** Version, Python, installation method, commands, sanitized
+   input, expected behavior, and actual behavior are easier to collect before triage begins.
+2. **Give rule proposals their own path.** A rule needs normative status, pinned source, diagnostic,
+   examples, and false-positive analysis that a generic feature template would not request.
+3. **Keep accidental internals private.** `genai_tracecheck.__all__` is the explicit integration
+   boundary; adding a top-level name requires types, documentation, and tests.
+4. **Ship typing as product behavior.** Source annotations are useful to downstream users only when
+   the wheel and sdist include the PEP 561 marker.
+5. **Test artifacts away from the repository.** Isolated mode and a temporary working directory
+   prevent the checkout from hiding a missing module or package-data error.
+6. **Exercise behavior, not only importability.** A successful `--version` cannot prove the console
+   entry point, Pydantic dependency, loader, analyzer, and report writer work together.
+
+### Verification result
+
+- All three Issue Form/config YAML files parsed as mappings.
+- Ruff lint and formatting checks: passed.
+- Pytest: 131 passed.
+- Combined statement/branch coverage: 98% (minimum: 95%).
+- Compatibility matrix regeneration check: passed.
+- Wheel and source distribution rebuilt with `genai_tracecheck/py.typed` present.
+- Fresh wheel installation: public API, `pip check`, isolated import, typing marker, and CLI passed.
+- Fresh sdist installation: public API, `pip check`, isolated import, typing marker, and CLI passed.
+
+### Next task
+
+Prepare Day 13's upstream contribution research: re-check current upstream contribution guidance and
+issues, reduce the compatibility observation to a small evidence-backed proposal, and draft it for
+owner review without publishing externally.

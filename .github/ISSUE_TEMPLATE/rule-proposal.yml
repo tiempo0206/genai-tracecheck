@@ -1,0 +1,79 @@
+name: Rule proposal
+description: Propose an evidence-backed structural, GenAI semantic, or local-policy rule.
+title: "[Rule]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A new rule needs a precise source, a safe test case, and a false-positive analysis. An open
+        proposal is not an accepted OpenTelemetry requirement. Please read `docs/rule-authoring.md`
+        before submitting.
+  - type: input
+    id: rule-name
+    attributes:
+      label: Proposed rule name
+      placeholder: Require a non-zero trace identifier
+    validations:
+      required: true
+  - type: dropdown
+    id: family
+    attributes:
+      label: Rule family
+      options:
+        - GTC0xx — OTLP structure and trace graph
+        - GTC1xx — OpenTelemetry GenAI semantics
+        - GTC2xx — TraceCheck privacy or local policy
+    validations:
+      required: true
+  - type: dropdown
+    id: evidence-status
+    attributes:
+      label: Evidence status
+      options:
+        - Required by an accepted specification
+        - Conditionally required by an accepted specification
+        - Recommended or opt-in behavior
+        - Experimental or proposed behavior
+        - TraceCheck local policy
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Exact upstream source
+      description: Link to a pinned specification revision and the relevant section when applicable.
+      placeholder: https://github.com/.../blob/<commit>/path/to/spec.md#section
+    validations:
+      required: true
+  - type: textarea
+    id: invariant
+    attributes:
+      label: Invariant and diagnostic
+      description: State what is checked, when it applies, proposed severity, and a content-safe message.
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: Positive, negative, and boundary examples
+      description: Describe invented examples; do not paste production traces.
+    validations:
+      required: true
+  - type: textarea
+    id: false-positives
+    attributes:
+      label: False-positive and compatibility risks
+      description: Explain partial exports, provider differences, experimental attributes, or other limits.
+    validations:
+      required: true
+  - type: checkboxes
+    id: readiness
+    attributes:
+      label: Proposal checks
+      options:
+        - label: I distinguished accepted requirements from recommendations, experiments, and local policy.
+          required: true
+        - label: I can provide synthetic tests without real prompts, secrets, or personal data.
+          required: true

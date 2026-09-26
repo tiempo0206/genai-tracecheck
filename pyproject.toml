@@ -39,6 +39,9 @@ Issues = "https://github.com/tiempo0206/genai-tracecheck/issues"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+genai_tracecheck = ["py.typed"]
+
 [tool.pytest.ini_options]
 addopts = "-q"
 testpaths = ["tests"]

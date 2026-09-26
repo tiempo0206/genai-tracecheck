@@ -61,6 +61,9 @@ def resolve_input_paths(inputs: Sequence[str | Path]) -> list[Path]:
 
     Directory traversal is recursive, ignores hidden entries, and never follows
     symlinked directories. Glob expansion is performed by Python rather than a shell.
+
+    Raises:
+        InputResolutionError: If no inputs are supplied or any requested input matches no files.
     """
 
     if not inputs:
@@ -96,7 +99,15 @@ def analyze_batch(
     policy: Policy | None = None,
     generated_at: datetime | None = None,
 ) -> BatchReport:
-    """Analyze resolved files independently and aggregate their stable results."""
+    """Analyze resolved files independently and aggregate their stable results.
+
+    Files are sorted before analysis. A malformed file becomes a ``load_error`` entry and does not
+    discard successful siblings. Call :func:`resolve_input_paths` first when accepting user paths,
+    directories, or glob patterns.
+
+    Raises:
+        InputResolutionError: If ``paths`` is empty.
+    """
 
     if not paths:
         raise InputResolutionError("at least one resolved file is required")

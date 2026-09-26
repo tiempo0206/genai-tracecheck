@@ -52,6 +52,21 @@ def analyze_spans(
     policy: Policy | None = None,
     generated_at: datetime | None = None,
 ) -> AnalysisReport:
+    """Evaluate normalized spans and return one deterministic analysis report.
+
+    Args:
+        spans: Records produced by :func:`load_otlp_json` or another trusted adapter.
+        source: Display identity retained in JSON and SARIF output. The analyzer does not read it.
+        policy: Effective rule and quality-gate settings. Defaults to :class:`Policy`.
+        generated_at: Optional timestamp override for reproducible tests and generated artifacts.
+
+    Returns:
+        A strict report containing sorted findings, per-trace metrics, and the gate decision.
+
+    The input list is not mutated. Captured values are inspected only by rule implementations and
+    are never copied into findings unless an explicitly reviewed diagnostic contract allows it.
+    """
+
     active_policy = policy or Policy()
     span_findings = [finding for span in spans for finding in evaluate_span(span, active_policy)]
     raw_findings = [*span_findings, *evaluate_trace_graph(spans, active_policy)]

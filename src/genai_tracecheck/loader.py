@@ -71,7 +71,17 @@ def _optional_int(value: Any, field_name: str) -> int | None:
 
 
 def load_otlp_json(path: str | Path) -> list[SpanRecord]:
-    """Load spans from an OTLP/HTTP JSON ExportTraceServiceRequest."""
+    """Load normalized spans from an OTLP/HTTP JSON ExportTraceServiceRequest.
+
+    Args:
+        path: UTF-8 JSON file containing a top-level ``resourceSpans`` list.
+
+    Returns:
+        Span records in their input order with recursive OTLP ``AnyValue`` decoding applied.
+
+    Raises:
+        TraceLoadError: If the file cannot be read, parsed, or normalized safely.
+    """
 
     input_path = Path(path)
     try:

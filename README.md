@@ -197,6 +197,21 @@ Each report also includes per-trace wall-clock duration, summed model/tool-call 
 observed input/output token totals. See [`docs/metrics.md`](docs/metrics.md) for exact definitions and
 the important overlap and double-counting limitations.
 
+## Python API
+
+Adapters and local automation can use the typed top-level API without importing internal modules:
+
+```python
+from genai_tracecheck import Policy, analyze_spans, load_otlp_json
+
+spans = load_otlp_json("trace.otlp.json")
+report = analyze_spans(spans, source="trace.otlp.json", policy=Policy())
+print(report.passed, report.summary.errors)
+```
+
+The package ships a `py.typed` marker. Public models, controlled exceptions, batch discovery,
+configuration loading, and SARIF conversion are documented in [`docs/api.md`](docs/api.md).
+
 ## Standards baseline
 
 The first release follows the current OpenTelemetry GenAI attribute registry and span guidance,
@@ -215,8 +230,9 @@ and project releases will record the standards snapshot they target.
 Version `0.2.0` is a tested vertical slice: canonical OTLP JSON in, deterministic single-file or
 batch reports out, with reusable policy configuration and auditable CI behavior. Framework-generated
 fixtures now cover OpenAI and LangChain instrumentation, and the benchmark characterizes the pipeline
-through 100K spans with one profile-backed optimization. The two-week plan continues with contributor
-experience and an upstream-ready research note. See
+through 100K spans with one profile-backed optimization. Structured issue forms, a rule-authoring
+guide, typed public API, and clean wheel/sdist tests support outside contributors. The two-week plan
+continues with an upstream-ready research note. See
 [`docs/roadmap.md`](docs/roadmap.md) and [`docs/project-log.md`](docs/project-log.md).
 
 ## Development
@@ -224,11 +240,13 @@ experience and an upstream-ready research note. See
 ```bash
 ruff format .
 ruff check .
-pytest
+coverage run -m pytest
+coverage report
 ```
 
-Contributions should include a minimal OTLP fixture and tests for every new rule. See
-[`CONTRIBUTING.md`](CONTRIBUTING.md).
+Contributions should include a minimal synthetic OTLP fixture and independent tests for every new
+rule. See [`CONTRIBUTING.md`](CONTRIBUTING.md) and the
+[`rule-authoring guide`](docs/rule-authoring.md).
 
 ## License
 
