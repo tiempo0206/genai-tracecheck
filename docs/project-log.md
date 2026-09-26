@@ -568,3 +568,70 @@ behavior or turning the SARIF artifact into another copy of sensitive telemetry.
 
 Implement Day 11's reproducible 1K/10K/100K span benchmark, recording seed, throughput, peak memory,
 and profiler-backed optimization decisions.
+
+## 2026-09-26 — Day 11: reproducible performance benchmark
+
+### Objective
+
+Characterize TraceCheck at 1K, 10K, and 100K spans with reproducible input, phase-specific timing
+and memory evidence, then change production code only when a deterministic profile identifies a
+specific avoidable cost.
+
+### Method research
+
+- Selected `time.perf_counter_ns` for high-resolution elapsed-time samples without floating-point
+  clock conversion loss.
+- Selected `tracemalloc.get_traced_memory` for phase-local current and peak Python allocations,
+  explicitly distinguishing this value from operating-system RSS.
+- Selected the standard-library deterministic `cProfile` implementation and `pstats` cumulative
+  ordering for hotspot attribution.
+- Kept timing and memory passes separate because allocation tracing changes runtime cost.
+
+### Completed
+
+- Added a versioned generator with seed `20260926` that streams canonical OTLP JSON without holding
+  a second large fixture object graph in memory.
+- Generated valid 100-span trace groups with deterministic IDs, contained child timing, model and
+  provider identity, and valid token usage.
+- Added preflight validation requiring exact span counts, a passing quality gate, and zero findings.
+- Measured isolated loading, analysis, and end-to-end phases with one warm-up and three timed samples.
+- Recorded medians, sample ranges, throughput, phase-local peak Python allocations, fixture sizes,
+  SHA-256 digests, environment metadata, and methodology in a versioned JSON artifact.
+- Retained cumulative profiles before and after the production optimization.
+- Reused each validated token value across nine token-subset checks instead of validating the same
+  attributes repeatedly.
+- Added deterministic-generator, fixture-validity, and benchmark-contract tests.
+- Added a 100-span benchmark smoke step to both Python 3.11 and 3.12 CI jobs.
+- Documented reproduction commands, results, interpretation limits, and why no time threshold is
+  enforced on shared CI runners.
+
+### Engineering decisions
+
+1. **Generate large evidence, do not commit it.** The 100K input is about 58.5 MiB and is reproduced
+   from a seed; only its digest and compact results belong in Git.
+2. **Separate phases.** Loading and analysis answer different architectural questions, while the
+   end-to-end number represents the user-visible path.
+3. **Separate timing from tracing.** Untraced medians describe speed; a separate `tracemalloc` run
+   describes allocations without pretending the two measurements are one uncontaminated sample.
+4. **Optimize from evidence.** The baseline profile showed 1.8 million token-validation calls for
+   200,000 attributes. Per-span reuse was local, testable, and preserved rule semantics.
+5. **Do not optimize away contracts.** Strict Pydantic construction and full-document JSON parsing
+   remain visible costs; changing either needs broader input and API evidence.
+6. **No benchmark theater in CI.** CI checks that the harness works but does not fail builds because
+   a shared runner was temporarily slow.
+
+### Verification result
+
+- Fixed-seed regeneration: byte-identical files and stable SHA-256 digests.
+- 100K fixture: 100,000 valid GenAI spans across 1,000 complete traces with zero findings.
+- Optimized 100K analysis median: 0.495828 seconds, or 201,683 spans/second.
+- Optimized 100K end-to-end median: 1.677553 seconds, or 59,611 spans/second.
+- 100K end-to-end peak Python allocations: 483.60 MiB; loading is the dominant memory phase.
+- Profile-backed change: analysis median improved 20.2% and end-to-end median improved 10.5%.
+- Token-check cumulative profile time fell from 1.157 seconds to 0.298 seconds.
+- Focused rule and benchmark tests, Ruff lint, and formatting checks passed before the full suite.
+
+### Next task
+
+Implement Day 12 contributor experience: issue templates, a rule-author checklist, clearer public
+API/docstrings, and another clean-environment installation test.

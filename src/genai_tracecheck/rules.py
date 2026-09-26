@@ -130,8 +130,7 @@ def structural_findings(span: SpanRecord) -> Iterable[Finding]:
         yield _finding(span, "GTC002", Severity.ERROR, "span end timestamp precedes its start")
 
 
-def _valid_token(attributes: dict[str, object], key: str) -> int | None:
-    value = attributes.get(key)
+def _valid_token(value: object) -> int | None:
     if isinstance(value, bool) or not isinstance(value, int) or value < 0:
         return None
     return value
@@ -174,16 +173,16 @@ def _latency_findings(span: SpanRecord) -> Iterable[Finding]:
         )
 
 
-def _token_consistency_findings(span: SpanRecord) -> Iterable[Finding]:
+def _token_consistency_findings(
+    span: SpanRecord,
+    valid_tokens: dict[str, int],
+    usage_attributes: list[str],
+) -> Iterable[Finding]:
     for aggregate_key, component_keys in TOKEN_SUBSET_GROUPS:
-        aggregate = _valid_token(span.attributes, aggregate_key)
+        aggregate = valid_tokens.get(aggregate_key)
         if aggregate is None:
             continue
-        components = {
-            key: value
-            for key in component_keys
-            if (value := _valid_token(span.attributes, key)) is not None
-        }
+        components = {key: valid_tokens[key] for key in component_keys if key in valid_tokens}
         component_sum = sum(components.values())
         if components and component_sum > aggregate:
             yield _finding(
@@ -198,11 +197,6 @@ def _token_consistency_findings(span: SpanRecord) -> Iterable[Finding]:
             )
 
     operation = span.attributes.get("gen_ai.operation.name")
-    usage_attributes = sorted(
-        key
-        for key in span.attributes
-        if key.startswith("gen_ai.usage.") and key.endswith("_tokens")
-    )
     if operation == TOOL_OPERATION and usage_attributes:
         yield _finding(
             span,
@@ -249,9 +243,13 @@ def semantic_findings(span: SpanRecord) -> Iterable[Finding]:
                 "GenAI model is unknown; add request or response model when available",
             )
 
+    valid_tokens: dict[str, int] = {}
+    usage_attributes: list[str] = []
     for key, value in span.attributes.items():
         if key.startswith("gen_ai.usage.") and key.endswith("_tokens"):
-            if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            usage_attributes.append(key)
+            valid_value = _valid_token(value)
+            if valid_value is None:
                 yield _finding(
                     span,
                     "GTC104",
@@ -259,9 +257,11 @@ def semantic_findings(span: SpanRecord) -> Iterable[Finding]:
                     "token usage must be a non-negative integer",
                     key,
                 )
+            else:
+                valid_tokens[key] = valid_value
 
     yield from _latency_findings(span)
-    yield from _token_consistency_findings(span)
+    yield from _token_consistency_findings(span, valid_tokens, sorted(usage_attributes))
 
     for key in SCHEMA_ATTRIBUTES:
         if key not in span.attributes:

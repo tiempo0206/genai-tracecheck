@@ -41,6 +41,11 @@ with one default policy, joins framework provenance, and writes a content-free c
 snapshot. Fixture purpose and expected gate are explicit, so a new fixture cannot silently disappear
 from the evidence set.
 
+`benchmarks/run.py` streams fixed-seed canonical OTLP fixtures into a temporary directory, validates
+them through the public loader and analyzer, and measures load, analysis, and end-to-end phases
+independently. Only compact result and cumulative-profile evidence is committed; 1K/10K/100K input
+files are regenerated rather than stored.
+
 ## Trust boundaries
 
 - Input trace files are untrusted. Invalid structure produces a controlled load error.
@@ -55,6 +60,7 @@ from the evidence set.
 - Policy rules are labeled separately from upstream semantic-convention checks.
 - Compatibility output contains presence metadata and rule IDs, never captured content values.
 - SARIF fingerprints hash trace identity and safe structural details; raw identifiers are omitted.
+- Benchmark fixtures contain invented metadata only and are deleted with their temporary directory.
 
 ## Partial versus complete trace exports
 

@@ -106,11 +106,16 @@ deprecations, local policy, and deliberate negative tests.
 every result has a repository-relative location and deterministic fingerprint, tests prove severity
 overrides and content non-disclosure, and a least-privilege workflow demonstrates GitHub upload.
 
-### Day 11 — performance benchmark
+### Day 11 — performance benchmark (completed)
 
 - Benchmark 1K, 10K, and 100K synthetic spans.
 - Record peak memory, throughput, and fixture generator seed.
 - Optimize only bottlenecks supported by a profile.
+
+**Definition of done:** a fixed-seed streaming generator produces valid 1K/10K/100K OTLP fixtures,
+three isolated phases record median throughput and peak Python allocations, a 100K cumulative
+profile is retained, and the only core optimization is supported by before/after measurements while
+CI smoke-tests the benchmark contract on both supported Python versions.
 
 ### Day 12 — contributor experience
 

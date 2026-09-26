@@ -1,0 +1,31 @@
+         16026119 function calls in 3.721 seconds
+
+   Ordered by: cumulative time
+   List reduced from 105 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.031    0.031    3.721    3.721 run.py:146(_end_to_end)
+        1    0.039    0.039    1.946    1.946 run.py:138(_load)
+        1    0.183    0.183    1.907    1.907 loader.py:73(load_otlp_json)
+        1    0.000    0.000    1.744    1.744 run.py:142(_analyze)
+        1    0.015    0.015    1.744    1.744 analysis.py:48(analyze_spans)
+   100000    0.059    0.000    1.150    0.000 rules.py:330(evaluate_span)
+   300001    0.057    0.000    0.944    0.000 {method 'extend' of 'list' objects}
+   101003    0.779    0.000    0.879    0.000 main.py:253(__init__)
+   100000    0.287    0.000    0.823    0.000 rules.py:210(semantic_findings)
+   100001    0.214    0.000    0.420    0.000 loader.py:48(_decode_attributes)
+        1    0.000    0.000    0.308    0.308 __init__.py:299(loads)
+        1    0.000    0.000    0.308    0.308 decoder.py:340(decode)
+        1    0.308    0.308    0.308    0.308 decoder.py:351(raw_decode)
+        1    0.011    0.011    0.298    0.298 metrics.py:90(summarize_traces)
+   100000    0.182    0.000    0.298    0.000 rules.py:176(_token_consistency_findings)
+     1000    0.045    0.000    0.283    0.000 metrics.py:33(_summarize_trace)
+  3799009    0.236    0.000    0.236    0.000 {method 'get' of 'dict' objects}
+        1    0.013    0.013    0.226    0.226 graph_rules.py:165(evaluate_trace_graph)
+   506001    0.051    0.000    0.213    0.000 {built-in method builtins.sum}
+     1000    0.070    0.000    0.208    0.000 graph_rules.py:102(_trace_findings)
+   300000    0.053    0.000    0.141    0.000 classification.py:9(is_genai_span)
+   400001    0.045    0.000    0.133    0.000 {built-in method builtins.any}
+  3200017    0.124    0.000    0.124    0.000 {built-in method builtins.isinstance}
+   500001    0.090    0.000    0.106    0.000 loader.py:18(_decode_any_value)
+   101003    0.100    0.000    0.100    0.000 {method 'validate_python' of 'pydantic_core._pydantic_core.SchemaValidator' objects}

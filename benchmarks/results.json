@@ -1,0 +1,128 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-09-26T03:24:12.022514Z",
+  "environment": {
+    "python": "3.13.9",
+    "python_implementation": "CPython",
+    "platform": "macOS-15.6.1-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "processor": "arm",
+    "logical_cpu_count": 10
+  },
+  "methodology": {
+    "clock": "time.perf_counter_ns",
+    "timing_statistic": "median",
+    "repeats": 3,
+    "warmups_per_phase": 1,
+    "memory": "tracemalloc peak Python allocations from a separate run",
+    "spans_per_trace": 100,
+    "fixture_seed": 20260926
+  },
+  "cases": [
+    {
+      "spans": 1000,
+      "traces": 10,
+      "fixture": {
+        "generator_version": "1.0",
+        "seed": 20260926,
+        "sha256": "58ea75955aa044d3d1cc31e9bbe4a042fbc0a331c1c9f8e1e69f1255d437f82c",
+        "size_bytes": 613164
+      },
+      "phases": {
+        "load": {
+          "median_seconds": 0.005233,
+          "min_seconds": 0.005092,
+          "max_seconds": 0.005286,
+          "throughput_spans_per_second": 191094.97,
+          "peak_python_memory_bytes": 5078117
+        },
+        "analyze": {
+          "median_seconds": 0.004742,
+          "min_seconds": 0.004683,
+          "max_seconds": 0.004821,
+          "throughput_spans_per_second": 210881.48,
+          "peak_python_memory_bytes": 45784
+        },
+        "end_to_end": {
+          "median_seconds": 0.009846,
+          "min_seconds": 0.009826,
+          "max_seconds": 0.009992,
+          "throughput_spans_per_second": 101564.09,
+          "peak_python_memory_bytes": 5078117
+        }
+      }
+    },
+    {
+      "spans": 10000,
+      "traces": 100,
+      "fixture": {
+        "generator_version": "1.0",
+        "seed": 20260926,
+        "sha256": "4d62a27a52247586edcd2a0c42fb7e0d2994964c7e79b7e5ad5bb827044ae74a",
+        "size_bytes": 6129895
+      },
+      "phases": {
+        "load": {
+          "median_seconds": 0.08438,
+          "min_seconds": 0.080292,
+          "max_seconds": 0.090955,
+          "throughput_spans_per_second": 118511.5,
+          "peak_python_memory_bytes": 50723857
+        },
+        "analyze": {
+          "median_seconds": 0.050001,
+          "min_seconds": 0.049876,
+          "max_seconds": 0.050356,
+          "throughput_spans_per_second": 199996.0,
+          "peak_python_memory_bytes": 256623
+        },
+        "end_to_end": {
+          "median_seconds": 0.124605,
+          "min_seconds": 0.123882,
+          "max_seconds": 0.128543,
+          "throughput_spans_per_second": 80253.6,
+          "peak_python_memory_bytes": 50723857
+        }
+      }
+    },
+    {
+      "spans": 100000,
+      "traces": 1000,
+      "fixture": {
+        "generator_version": "1.0",
+        "seed": 20260926,
+        "sha256": "3210c988aa1dfc018877f3024ebb8bfb6ed4c249927a3469b4ac379c6246b8d6",
+        "size_bytes": 61297210
+      },
+      "phases": {
+        "load": {
+          "median_seconds": 1.182369,
+          "min_seconds": 1.156398,
+          "max_seconds": 1.20846,
+          "throughput_spans_per_second": 84575.97,
+          "peak_python_memory_bytes": 507095665
+        },
+        "analyze": {
+          "median_seconds": 0.495828,
+          "min_seconds": 0.492858,
+          "max_seconds": 0.49723,
+          "throughput_spans_per_second": 201682.84,
+          "peak_python_memory_bytes": 2404063
+        },
+        "end_to_end": {
+          "median_seconds": 1.677553,
+          "min_seconds": 1.672109,
+          "max_seconds": 1.708345,
+          "throughput_spans_per_second": 59610.64,
+          "peak_python_memory_bytes": 507095665
+        }
+      }
+    }
+  ],
+  "profile": {
+    "spans": 100000,
+    "sort": "cumulative",
+    "rows": 25,
+    "output": "profile-100k.txt"
+  }
+}
