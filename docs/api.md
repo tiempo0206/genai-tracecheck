@@ -4,9 +4,10 @@ The command-line interface is the primary CI boundary, but the package also expo
 API for adapters, notebooks, and local automation. Names listed in `genai_tracecheck.__all__` are the
 intentional public surface; other modules and underscored names are implementation details.
 
-Version `0.2.x` remains pre-1.0, so incompatible public changes are still possible. They must be
-documented and tested rather than occurring accidentally. The installed package includes `py.typed`
-so type checkers can consume its inline annotations.
+Version `1.x` treats the explicit `genai_tracecheck.__all__` surface and report schema version `1.0`
+as compatibility commitments. An incompatible public API or report change requires a new major
+version; additive changes still require documentation and regression tests. The installed package
+includes `py.typed` so type checkers can consume its inline annotations.
 
 ## Analyze one export
 

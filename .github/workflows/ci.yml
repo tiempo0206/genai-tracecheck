@@ -32,6 +32,8 @@ jobs:
         run: >-
           python -m benchmarks.run --sizes 100 --repeats 1 --warmups 0 --no-profile
           --output "${{ runner.temp }}/benchmark-smoke.json"
+      - name: Run the portfolio demo
+        run: python tools/demo.py
       - name: Exercise the CLI
         run: |
           genai-tracecheck check examples/valid.otlp.json --output reports/valid.json

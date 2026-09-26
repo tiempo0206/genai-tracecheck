@@ -112,6 +112,9 @@ flags explicitly supplied on the command line. Configuration is never discovered
 | `GTC107` | GenAI latency | error | Time to first chunk is finite, non-negative, and inside span duration |
 | `GTC108` | GenAI token usage | error | Token breakdown subsets do not exceed their aggregate totals |
 | `GTC109` | GenAI token usage | warning | `execute_tool` spans do not report token usage |
+| `GTC110` | GenAI tool semantics | error | `execute_tool` spans include a non-empty tool name |
+| `GTC111` | GenAI response semantics | error | Finish reasons form an array of non-empty strings |
+| `GTC112` | GenAI server semantics | error | A recorded server port is an integer from 1 through 65535 |
 | `GTC201` | Local privacy policy | warning/error | Captured GenAI content is surfaced for review or forbidden |
 | `GTC202` | Local privacy heuristic | error | Secret-shaped values do not appear in captured content |
 
@@ -214,7 +217,8 @@ configuration loading, and SARIF conversion are documented in [`docs/api.md`](do
 
 ## Standards baseline
 
-The first release follows the current OpenTelemetry GenAI attribute registry and span guidance,
+Version `1.0.0` follows OpenTelemetry GenAI attribute registry and span guidance pinned at
+[`e57c543`](https://github.com/open-telemetry/semantic-conventions-genai/tree/e57c543b4889619eb2a05702471937db5119165d),
 including the newer structured `gen_ai.input.messages`, `gen_ai.output.messages`, and
 `gen_ai.system_instructions` model. The implementation is based on these upstream sources:
 
@@ -227,14 +231,13 @@ and project releases will record the standards snapshot they target.
 
 ## Project status
 
-Version `0.2.0` is a tested vertical slice: canonical OTLP JSON in, deterministic single-file or
-batch reports out, with reusable policy configuration and auditable CI behavior. Framework-generated
-fixtures now cover OpenAI and LangChain instrumentation, and the benchmark characterizes the pipeline
-through 100K spans with one profile-backed optimization. Structured issue forms, a rule-authoring
-guide, typed public API, and clean wheel/sdist tests support outside contributors. An upstream-ready
-research note now reduces one compatibility observation to pinned evidence and a human-review draft
-without posting on the owner's behalf. The two-week plan continues with the portfolio release. See
-[`docs/roadmap.md`](docs/roadmap.md) and [`docs/project-log.md`](docs/project-log.md).
+Version `1.0.0` is the portfolio release: canonical OTLP JSON in, deterministic single-file or batch
+JSON/SARIF reports out, with 20 independently tested rules, reusable policy configuration, two real
+instrumentation sources, reproducible compatibility and performance evidence, and auditable CI.
+Structured contributor workflows, a typed public API, and clean wheel/sdist tests support outside
+contributors. See the [`portfolio evidence`](docs/portfolio.md),
+[`short demo`](docs/demo.md), [`two-week roadmap`](docs/roadmap.md), and
+[`project log`](docs/project-log.md).
 
 ## Development
 

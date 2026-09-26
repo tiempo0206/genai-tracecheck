@@ -16,6 +16,9 @@ RULE_METADATA = {
     "GTC107": ("Valid time to first chunk", "error"),
     "GTC108": ("Token breakdown does not exceed aggregate", "error"),
     "GTC109": ("Tool spans do not report token usage", "warning"),
+    "GTC110": ("Tool spans include a tool name", "error"),
+    "GTC111": ("Valid response finish reasons", "error"),
+    "GTC112": ("Valid GenAI server port", "error"),
     "GTC201": ("Captured GenAI content follows local privacy policy", "warning"),
     "GTC202": ("No secret-shaped values in captured GenAI content", "error"),
 }
