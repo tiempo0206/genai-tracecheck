@@ -770,3 +770,64 @@ claim that the behavior is already a confirmed defect.
 Complete Day 14's portfolio release: audit the final acceptance criteria, close any remaining rule
 count gap, publish durable architecture/demo evidence, prepare measured resume bullets, and tag
 `v1.0.0` only after the merged release commit and CI are green.
+
+## 2026-09-26 — Day 14: portfolio release
+
+### Objective
+
+Close every documented acceptance gap, present the engineering evidence in a concise portfolio
+artifact, and prepare a release that can be tagged only from a reviewed, green `main` commit.
+
+### Acceptance audit and rule completion
+
+- Audited each final criterion against executable tests, generators, artifacts, CI configuration,
+  and current documentation rather than treating the roadmap as proof by itself.
+- Found one real gap: the project had 17 rule IDs while the roadmap required at least 20.
+- Added `GTC110` for the required non-empty tool name on `execute_tool` spans.
+- Added `GTC111` for the published `string[]` finish-reasons attribute contract.
+- Added `GTC112` for an integer GenAI server port in the usable 1–65535 range, while explicitly
+  keeping the disputed default-port emission question outside the rule.
+- Added independent invalid/valid boundary tests and an exact 20-rule release invariant.
+
+### Completed
+
+- Advanced package and runtime metadata to `1.0.0` and the beta development classifier.
+- Added a portfolio page with a rendered Mermaid architecture diagram, measured benchmark summary,
+  acceptance evidence, reproducibility commands, and three honest resume bullets.
+- Added a deterministic three-stage demo covering a passing trace, expected gate failure, and
+  content-safe SARIF with stable fingerprints.
+- Added the demo to both supported CI jobs and regression-tested its exact output.
+- Added release-contract tests binding the runtime/package version, changelog, README, rule count,
+  diagram, benchmark numbers, optimization claim, and demo documentation.
+- Updated the README rule catalog and release status, changelog, architecture cross-reference, and
+  roadmap acceptance audit.
+
+### Engineering decisions
+
+1. **Close the rule gap with normative data contracts.** New checks use required attributes or
+   published value types and deterministic boundaries, not subjective model-output quality.
+2. **Do not turn the upstream question into a local fact.** `GTC112` validates a port only when it is
+   present; it does not claim that implicit HTTPS 443 must be emitted.
+3. **Make the demo executable evidence.** Its expected failures are asserted as product behavior,
+   and any secret value appearing in SARIF makes the demo fail.
+4. **Publish measured context, not a vanity number.** Benchmark environment, seed, samples, peak
+   allocation definition, and one-machine limitations remain adjacent to the headline throughput.
+5. **Separate release content from release authority.** Versioned code is reviewed through a PR;
+   the annotated tag is created only at the merged commit after main CI is green.
+
+### Verification result
+
+- Rule catalog: exactly 20 independently addressable IDs.
+- Ruff lint and formatting checks: passed.
+- Pytest: 159 passed.
+- Combined statement/branch coverage: 98% (minimum: 95%).
+- All ten compatibility expectations and regeneration check: passed.
+- Deterministic portfolio demo and SARIF non-disclosure assertion: passed.
+- 100-span fixed-seed benchmark smoke: passed.
+- Version `1.0.0` wheel and source distribution builds: passed.
+- Fresh wheel and fresh sdist installation, dependency, typing, import, and CLI probes: passed.
+
+### Release control
+
+Merge the Day 14 review commit, wait for both Python 3.11 and 3.12 checks on `main`, then create the
+annotated `v1.0.0` tag at that exact commit. Do not tag the feature branch or a merely local commit.

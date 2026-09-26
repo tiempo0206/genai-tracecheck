@@ -124,4 +124,4 @@ def test_module_entry_point_reports_version(monkeypatch, capsys) -> None:
         runpy.run_module("genai_tracecheck.__main__", run_name="__main__")
 
     assert exc_info.value.code == 0
-    assert "genai-tracecheck 0.2.0" in capsys.readouterr().out
+    assert "genai-tracecheck 1.0.0" in capsys.readouterr().out

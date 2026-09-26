@@ -37,6 +37,8 @@ SECRET_PATTERNS = (
 )
 
 TIME_TO_FIRST_CHUNK = "gen_ai.response.time_to_first_chunk"
+FINISH_REASONS = "gen_ai.response.finish_reasons"
+SERVER_PORT = "server.port"
 
 TOKEN_SUBSET_GROUPS = (
     (
@@ -207,6 +209,44 @@ def _token_consistency_findings(
         )
 
 
+def _operation_contract_findings(span: SpanRecord, operation: object) -> Iterable[Finding]:
+    if operation == TOOL_OPERATION:
+        tool_name = span.attributes.get("gen_ai.tool.name")
+        if not isinstance(tool_name, str) or not tool_name.strip():
+            yield _finding(
+                span,
+                "GTC110",
+                Severity.ERROR,
+                "execute_tool spans must include a non-empty gen_ai.tool.name",
+                "gen_ai.tool.name",
+            )
+
+    if FINISH_REASONS in span.attributes:
+        finish_reasons = span.attributes[FINISH_REASONS]
+        valid = isinstance(finish_reasons, list) and all(
+            isinstance(reason, str) and bool(reason.strip()) for reason in finish_reasons
+        )
+        if not valid:
+            yield _finding(
+                span,
+                "GTC111",
+                Severity.ERROR,
+                "response finish reasons must be an array of non-empty strings",
+                FINISH_REASONS,
+            )
+
+    if SERVER_PORT in span.attributes:
+        port = span.attributes[SERVER_PORT]
+        if isinstance(port, bool) or not isinstance(port, int) or not 1 <= port <= 65_535:
+            yield _finding(
+                span,
+                "GTC112",
+                Severity.ERROR,
+                "GenAI server port must be an integer between 1 and 65535",
+                SERVER_PORT,
+            )
+
+
 def semantic_findings(span: SpanRecord) -> Iterable[Finding]:
     operation = span.attributes.get("gen_ai.operation.name")
     operation_is_missing = not isinstance(operation, str) or not operation.strip()
@@ -242,6 +282,8 @@ def semantic_findings(span: SpanRecord) -> Iterable[Finding]:
                 Severity.WARNING,
                 "GenAI model is unknown; add request or response model when available",
             )
+
+    yield from _operation_contract_findings(span, operation)
 
     valid_tokens: dict[str, int] = {}
     usage_attributes: list[str] = []

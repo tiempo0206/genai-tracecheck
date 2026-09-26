@@ -141,11 +141,17 @@ the migrated upstream repository; the local fixture, current implementation, cur
 pinned convention are linked in a machine-readable evidence snapshot; a narrowly scoped human-review
 draft and post-confirmation patch plan are prepared; and nothing is posted on the owner's behalf.
 
-### Day 14 — portfolio release
+### Day 14 — portfolio release (completed)
 
 - Publish an architecture diagram, benchmark table, and short demo.
 - Tag `v1.0.0` only if the documented acceptance criteria are met.
 - Write resume bullets that state measured results, not inflated adoption claims.
+
+**Definition of done:** the final rule gap is closed with three pinned-contract checks; the 20-rule
+catalog, 159-test suite, 98% coverage, ten-fixture matrix, benchmark smoke, deterministic demo, and
+clean wheel/sdist installs pass; a rendered architecture diagram, measured benchmark table, honest
+resume bullets, changelog, and version `1.0.0` are committed; and the tag is created only from the
+merged `main` commit after both supported CI jobs pass.
 
 ## Final acceptance criteria
 
@@ -155,3 +161,14 @@ draft and post-confirmation patch plan are prepared; and nothing is posted on th
 - Reproducible benchmark and compatibility-matrix generation.
 - CI on supported Python versions and a clean install test.
 - Documentation that distinguishes official conventions from project policy.
+
+## Final acceptance audit
+
+| Criterion | Status | Authoritative evidence |
+| --- | --- | --- |
+| At least 20 independently tested rules | met | 20 catalog entries; focused tests for every new rule |
+| Two real instrumentation sources plus synthetic edge cases | met | pinned OpenAI/LangChain manifest; ten frozen fixtures |
+| Stable JSON and SARIF report contracts | met | strict report models; serialization and fingerprint tests |
+| Reproducible benchmark and compatibility matrix | met | fixed seed/digests; regeneration and smoke checks |
+| Supported-version CI and clean installation | met | Python 3.11/3.12 workflow; fresh wheel and sdist probes |
+| Official conventions separated from local policy | met | `GTC1xx` semantic rules; explicitly labeled `GTC2xx` policy |

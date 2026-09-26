@@ -8,6 +8,9 @@ rewriting quality rules.
 
 ## Data flow
 
+The portfolio page includes a rendered
+[`Mermaid architecture diagram`](portfolio.md#architecture) of this flow and its trust boundary.
+
 1. `config.py` strictly validates an explicit, versioned TOML policy and resolves rule controls.
 2. `batch.py` safely resolves file, directory, and glob inputs into a canonical sorted set.
 3. `loader.py` parses a canonical OTLP/HTTP JSON request and recursively decodes OTLP `AnyValue`
