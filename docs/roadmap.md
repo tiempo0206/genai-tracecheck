@@ -117,11 +117,16 @@ three isolated phases record median throughput and peak Python allocations, a 10
 profile is retained, and the only core optimization is supported by before/after measurements while
 CI smoke-tests the benchmark contract on both supported Python versions.
 
-### Day 12 — contributor experience
+### Day 12 — contributor experience (completed)
 
 - Add issue templates and a rule-author checklist.
 - Expand public APIs and docstrings where useful.
 - Test installation in a clean environment.
+
+**Definition of done:** structured bug and rule-proposal forms request sanitized, reproducible
+evidence; the PR template and rule-author guide cover provenance, privacy, tests, and synchronized
+contracts; the typed top-level API is documented and regression-tested; and CI installs both wheel
+and sdist into fresh environments before exercising imports, dependency integrity, and the CLI.
 
 ### Day 13 — upstream contribution preparation
 

@@ -1,0 +1,76 @@
+name: Bug report
+description: Report reproducible incorrect behavior using sanitized trace data.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a problem. Trace exports can contain prompts, credentials, tool
+        arguments, and retrieved documents. Use invented or thoroughly sanitized data only. Rotate
+        any credential that has already appeared in a trace.
+  - type: dropdown
+    id: version
+    attributes:
+      label: TraceCheck version
+      options:
+        - 0.2.0
+        - main / unreleased
+        - other
+    validations:
+      required: true
+  - type: input
+    id: python-version
+    attributes:
+      label: Python version
+      description: Include the full output of `python --version`.
+      placeholder: Python 3.12.7
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Installation and environment
+      description: Describe the operating system and whether you used a wheel, sdist, or editable install.
+      placeholder: macOS 15 arm64; installed from the 0.2.0 wheel in a fresh virtual environment
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction commands
+      description: Show the shortest command sequence that reproduces the behavior.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: fixture
+    attributes:
+      label: Sanitized OTLP fixture
+      description: Paste the smallest invented OTLP JSON input, or explain why input data is not involved.
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include exit status and safe diagnostics. Do not paste captured content or secrets.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety checks
+      options:
+        - label: I searched existing issues for the same behavior.
+          required: true
+        - label: The reproduction contains no real prompts, credentials, personal data, or proprietary trace content.
+          required: true

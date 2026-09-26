@@ -155,7 +155,17 @@ def report_to_sarif(
     *,
     working_directory: Path | None = None,
 ) -> dict[str, Any]:
-    """Convert a report without copying captured values or trace identifiers."""
+    """Convert an analysis or batch report to content-safe SARIF 2.1.0.
+
+    Args:
+        report: A completed single-file or batch analysis report.
+        working_directory: Base used to produce repository-relative artifact locations. Defaults to
+            the current working directory.
+
+    Returns:
+        A JSON-serializable SARIF document. Raw trace IDs, span IDs, and captured values are
+        omitted; stable fingerprints contain only hashes of reviewed identity fields.
+    """
 
     active_directory = working_directory or Path.cwd()
     rules = _rules()

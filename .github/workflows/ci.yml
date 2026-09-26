@@ -86,8 +86,5 @@ jobs:
           fi
       - name: Build distributions
         run: python -m build
-      - name: Smoke-test the wheel
-        run: |
-          python -m venv "${{ runner.temp }}/tracecheck-wheel"
-          "${{ runner.temp }}/tracecheck-wheel/bin/python" -m pip install dist/*.whl
-          "${{ runner.temp }}/tracecheck-wheel/bin/genai-tracecheck" --version
+      - name: Smoke-test wheel and source distribution
+        run: python tools/clean-install-smoke.py dist/*.whl dist/*.tar.gz

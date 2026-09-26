@@ -31,6 +31,12 @@ rewriting quality rules.
     fingerprints without copying trace identity or captured values.
 13. `cli.py` prints JSON/SARIF or writes it atomically, then returns a machine-friendly exit code.
 
+The typed integration boundary is the explicit `genai_tracecheck.__all__` surface. It exposes strict
+models, controlled exceptions, loader/discovery/configuration operations, single/batch analysis, and
+SARIF conversion. Internal validators and rule helpers remain free to evolve without becoming an
+accidental compatibility promise. The distributed `py.typed` marker makes inline annotations
+available to downstream type checkers.
+
 The core package remains framework-neutral. A separate development-only pipeline under
 `tools/framework-fixtures/` invokes real instrumentation against local mock/fake backends, exports
 SDK spans to canonical OTLP JSON, normalizes nondeterministic identifiers and timestamps, and freezes
@@ -61,6 +67,8 @@ files are regenerated rather than stored.
 - Compatibility output contains presence metadata and rule IDs, never captured content values.
 - SARIF fingerprints hash trace identity and safe structural details; raw identifiers are omitted.
 - Benchmark fixtures contain invented metadata only and are deleted with their temporary directory.
+- Clean-install verification runs outside the checkout against both wheel and source distributions,
+  checks dependency consistency and typed API presence, and analyzes an invented one-span fixture.
 
 ## Partial versus complete trace exports
 

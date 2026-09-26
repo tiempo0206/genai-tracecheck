@@ -63,7 +63,14 @@ def _validation_details(error: ValidationError) -> str:
 
 
 def load_policy_config(path: str | Path) -> Policy:
-    """Load configuration version 1.0 and return an effective policy."""
+    """Load a strict version ``1.0`` TOML configuration into an effective policy.
+
+    Unknown fields, rule IDs, and contradictory overrides are rejected rather than ignored. This
+    function performs no implicit configuration discovery.
+
+    Raises:
+        ConfigurationError: If the file is unreadable, invalid TOML, or violates the contract.
+    """
 
     config_path = Path(path).expanduser()
     try:
